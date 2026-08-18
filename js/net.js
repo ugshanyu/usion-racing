@@ -33,10 +33,6 @@ export class Net {
 		this.info = new Map();      // id → { name, avatar, ready }
 		this.joined = false;
 
-		this.mesh = null;           // WebRTC full mesh (P2P car snapshots)
-		this.meshOpen = new Set();  // peer ids with an open DataChannel
-		this._carTick = 0;
-
 		this.lastChatAt = 0;
 		this.appliedKickoffSeq = 0;
 		this.appliedRaceOverSeq = 0;
@@ -105,7 +101,6 @@ export class Net {
 			this.present.add( this.myId );
 			this.broadcastInfo();
 			this.emitRoster();
-			this.syncMeshRoster();
 
 		} );
 
@@ -121,7 +116,6 @@ export class Net {
 
 			this.broadcastInfo();   // newcomers missed earlier broadcasts
 			this.emitRoster();
-			this.syncMeshRoster();
 
 		} );
 
@@ -133,7 +127,6 @@ export class Net {
 			if ( id ) {
 
 				this.present.delete( id );
-				this.meshOpen.delete( id );
 				const info = this.info.get( id );
 				if ( info ) info.ready = false;
 				if ( hooks.onPlayerGone ) hooks.onPlayerGone( id );
@@ -141,7 +134,6 @@ export class Net {
 			}
 
 			this.emitRoster();
-			this.syncMeshRoster();
 
 		} );
 
@@ -225,57 +217,6 @@ export class Net {
 
 	}
 
-	// WebRTC mesh: car snapshots flow peer-to-peer (DataChannel over UDP) —
-	// the relay hop through the backend is what makes remote cars feel late.
-	// Signaling rides the realtime channel ('mesh'), handled inside the SDK.
-	// The relay remains a live fallback: snapshots are seq-deduped on receive,
-	// so whichever transport delivers first wins and duplicates are dropped.
-	syncMeshRoster() {
-
-		try {
-
-			if ( ! this.mesh ) {
-
-				if ( typeof Usion.game.createMeshNetwork !== 'function' ) return;
-				const mesh = Usion.game.createMeshNetwork( { autoReconnect: true } );
-				if ( ! mesh || typeof mesh.setRoster !== 'function' ) return;
-				this.mesh = mesh;
-
-				mesh.onPeerOpen = ( peerId ) => {
-
-					this.meshOpen.add( peerId );
-					if ( this.hooks.onMeshPeers ) this.hooks.onMeshPeers( this.meshOpen.size );
-
-				};
-
-				mesh.onPeerClose = ( peerId ) => {
-
-					this.meshOpen.delete( peerId );
-					if ( this.hooks.onMeshPeers ) this.hooks.onMeshPeers( this.meshOpen.size );
-
-				};
-
-				mesh.onMessage = ( peerId, data ) => {
-
-					if ( data && data.t === 'car' && data.d && this.hooks.onCarSnap ) {
-
-						this.hooks.onCarSnap( peerId, data.d );
-
-					}
-
-				};
-
-				mesh.onError = () => {};   // relay fallback covers failed pairs
-
-			}
-
-			const peers = this.playerIds.filter( ( id ) => id !== this.myId && this.present.has( id ) );
-			this.mesh.setRoster( peers ).catch( () => {} );
-
-		} catch {}
-
-	}
-
 	broadcastInfo() {
 
 		if ( ! this.joined ) return;
@@ -323,37 +264,13 @@ export class Net {
 
 	}
 
-	// Called at 30 Hz. P2P mesh gets every tick; the relay gets every 2nd tick
-	// (15 Hz) while any peer lacks an open channel, every 4th (7.5 Hz) once the
-	// mesh is complete — receivers dedupe by the snapshot's seq, so double
-	// delivery is free and the fastest transport wins.
 	sendCar( d ) {
 
-		this._carTick ++;
+		try {
 
-		if ( this.mesh && this.meshOpen.size > 0 ) {
+			Usion.game.realtime( 'car', d );
 
-			try {
-
-				this.mesh.broadcast( { t: 'car', d } );
-
-			} catch {}
-
-		}
-
-		const activePeers = this.playerIds.filter( ( id ) => id !== this.myId && this.present.has( id ) );
-		const allMeshed = activePeers.length > 0 && activePeers.every( ( id ) => this.meshOpen.has( id ) );
-		const relayEvery = allMeshed ? 4 : 2;
-
-		if ( this._carTick % relayEvery === 0 ) {
-
-			try {
-
-				Usion.game.realtime( 'car', d );
-
-			} catch {}
-
-		}
+		} catch {}
 
 	}
 

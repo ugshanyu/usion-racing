@@ -22,7 +22,7 @@ import { setLanguage, t } from './i18n.js';
 const LAPS = 3;
 const MAX_PLAYERS = 4;
 const CAR_COLORS = [ 'vehicle-truck-yellow', 'vehicle-truck-green', 'vehicle-truck-purple', 'vehicle-truck-red' ];
-const BROADCAST_MS = 33;          // 30 Hz send tick (net.sendCar decides per-transport cadence)
+const BROADCAST_MS = 66;          // ~15 Hz (first-version cadence)
 const RACE_OVER_TIMEOUT = 60;     // seconds after the first finisher
 
 // ---------- Usion bootstrap (with a graceful local-dev stub) ----------
@@ -78,7 +78,6 @@ const G = {
 	placements: null,
 	nameCache: new Map(),
 	lastHeartbeat: 0,
-	snapSeq: 0,           // global monotonic — never reset, so a stale packet from a previous race can't poison the dedupe
 };
 
 let renderer, scene, dirLight, cam, controls, particles, driftMarks, audio, audioRig, lapTimer, path, ui, net, models, world, contactListener;
@@ -297,7 +296,6 @@ async function init( config ) {
 		onPlayerGone: ( id ) => onPlayerGone( id ),
 		onRaceOver: ( placements ) => applyRaceOver( placements ),
 		onConnState: ( s ) => onConnState( s ),
-		onMeshPeers: ( n ) => ui.setP2P( n > 0 ),
 	} );
 
 	if ( ! launchedSolo( config ) && config.roomId ) {
@@ -544,7 +542,6 @@ function buildCarSnap() {
 		vz: Math.round( mv.z * 100 ) / 100,
 		l: lapTimer.lap,
 		rd: Math.round( rd * 10 ) / 10,
-		q: ++ G.snapSeq,
 	};
 
 }
