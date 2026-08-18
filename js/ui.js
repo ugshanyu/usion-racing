@@ -140,6 +140,8 @@ export class UI {
 		this.bestEl = this.el( 'span', null, bestRow, formatTime( null ) );
 		const right = this.el( 'div', 'hud-box', this.hud );
 		this.posEl = this.el( 'div', 'pos', right, '' );
+		this.p2pEl = this.el( 'div', null, right, '⚡ P2P' );
+		this.p2pEl.style.cssText = 'font-size:10px;font-weight:700;color:#5af168;display:none;margin-top:2px;text-align:right;';
 
 		// Countdown
 		this.countdown = this.el( 'div', null, this.root );
@@ -292,6 +294,12 @@ export class UI {
 		this.bestEl.textContent = formatTime( timer.bestLap );
 		const positions = t( 'positions' );
 		this.posEl.textContent = totalRacers > 1 ? ( positions[ position - 1 ] || position + '.' ) : '';
+
+	}
+
+	setP2P( active ) {
+
+		if ( this.p2pEl ) this.p2pEl.style.display = active ? 'block' : 'none';
 
 	}
 

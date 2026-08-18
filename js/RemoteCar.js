@@ -62,6 +62,8 @@ export class RemoteCar {
 		this.hasData = false;
 		this.wheelSpin = 0;
 
+		this.lastQ = - 1;           // cross-transport snapshot dedupe
+
 		// Adaptive-delay state (EWMA of arrival interval + jitter).
 		this.delayMs = 120;
 		this._lastArrival = null;
@@ -87,6 +89,15 @@ export class RemoteCar {
 	}
 
 	addSnapshot( d ) {
+
+		// The same snapshot arrives via P2P and (sometimes) the relay — accept
+		// each seq once, newest-first; stale relay copies are dropped here.
+		if ( typeof d.q === 'number' ) {
+
+			if ( d.q <= this.lastQ ) return;
+			this.lastQ = d.q;
+
+		}
 
 		const t = performance.now();
 
