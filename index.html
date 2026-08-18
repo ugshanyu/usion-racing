@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+	<meta name="usion:leaderboard" content="asc">
+	<title>Usion Racing</title>
+	<style>
+		html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0d10; overscroll-behavior: none; }
+		body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+		canvas { display: block; touch-action: none; }
+		#ui { position: absolute; inset: 0; pointer-events: none; z-index: 20;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #fff; }
+	</style>
+	<script src="https://usions.com/usion-sdk.js"></script>
+	<script type="importmap">
+	{
+		"imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/",
+			"crashcat": "https://esm.sh/crashcat@0.0.3"
+		}
+	}
+	</script>
+</head>
+<body>
+	<div id="ui"></div>
+	<script type="module" src="js/main.js"></script>
+</body>
+</html>
