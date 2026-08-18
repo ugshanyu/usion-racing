@@ -402,7 +402,7 @@ export class UI {
 	}
 
 	// placements: [{ id, name, time (sec|null), isMe, isBot }]
-	updateResults( placements, myBestLap, canRematch ) {
+	updateResults( placements, myTime, canRematch ) {
 
 		this.resultsList.textContent = '';
 		const positions = t( 'positions' );
@@ -417,7 +417,7 @@ export class UI {
 
 		} );
 
-		this.myBestEl.textContent = myBestLap ? `${ t( 'bestLap' ) }: ${ formatTime( myBestLap ) }` : '';
+		this.myBestEl.textContent = myTime ? `${ t( 'yourTime' ) }: ${ formatTime( myTime ) }` : '';
 		this.againBtn.style.display = canRematch ? '' : 'none';
 		this.resultsHint.style.display = canRematch ? 'none' : 'block';
 

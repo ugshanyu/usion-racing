@@ -22,7 +22,7 @@ import { setLanguage, t } from './i18n.js';
 const LAPS = 3;
 const MAX_PLAYERS = 4;
 const CAR_COLORS = [ 'vehicle-truck-yellow', 'vehicle-truck-green', 'vehicle-truck-purple', 'vehicle-truck-red' ];
-const BROADCAST_MS = 66;          // ~15 Hz
+const BROADCAST_MS = 50;          // 20 Hz
 const RACE_OVER_TIMEOUT = 60;     // seconds after the first finisher
 
 // ---------- Usion bootstrap (with a graceful local-dev stub) ----------
@@ -309,6 +309,8 @@ async function init( config ) {
 
 	}
 
+	window.__racing = { G, get controls() { return controls; }, get net() { return net; } };
+
 	animate();
 
 }
@@ -523,29 +525,62 @@ function onKickoff( { seats } ) {
 
 }
 
+function buildCarSnap() {
+
+	_forward.set( 0, 0, 1 ).applyQuaternion( G.vehicle.container.quaternion );
+	const h = Math.atan2( _forward.x, _forward.z );
+	const p = G.vehicle.spherePos;
+	const mv = G.vehicle.modelVelocity;
+	const rd = path.raceDistance( p, lapTimer.lap - 1 );
+
+	return {
+		x: Math.round( p.x * 100 ) / 100,
+		y: Math.round( ( p.y - 0.5 ) * 100 ) / 100,
+		z: Math.round( p.z * 100 ) / 100,
+		h: Math.round( h * 1000 ) / 1000,
+		vx: Math.round( mv.x * 100 ) / 100,
+		vz: Math.round( mv.z * 100 ) / 100,
+		l: lapTimer.lap,
+		rd: Math.round( rd * 10 ) / 10,
+	};
+
+}
+
 function startBroadcast() {
 
 	stopBroadcast();
 	G.broadcastTimer = setInterval( () => {
 
 		if ( ! G.vehicle || G.mode !== 'mp' ) return;
+		net.sendCar( buildCarSnap() );
 
-		_forward.set( 0, 0, 1 ).applyQuaternion( G.vehicle.container.quaternion );
-		const h = Math.atan2( _forward.x, _forward.z );
-		const p = G.vehicle.spherePos;
-		const mv = G.vehicle.modelVelocity;
-		const rd = path.raceDistance( p, lapTimer.lap - 1 );
+	}, BROADCAST_MS );
 
-		net.sendCar( {
-			x: Math.round( p.x * 100 ) / 100,
-			y: Math.round( ( p.y - 0.5 ) * 100 ) / 100,
-			z: Math.round( p.z * 100 ) / 100,
-			h: Math.round( h * 1000 ) / 1000,
-			vx: Math.round( mv.x * 100 ) / 100,
-			vz: Math.round( mv.z * 100 ) / 100,
-			l: lapTimer.lap,
-			rd: Math.round( rd * 10 ) / 10,
-		} );
+}
+
+// Dev-only netcode harness (?ghost=1, standalone solo): a ghost RemoteCar fed
+// by our own snapshots through simulated latency/jitter/loss, so interpolation
+// quality is observable without a second player.
+const GHOST_MODE = new URLSearchParams( window.location.search ).has( 'ghost' );
+
+function startGhost() {
+
+	if ( ! GHOST_MODE || G.mode !== 'solo' || G.remotes.has( 'ghost' ) ) return;
+
+	const slot = path.gridSlots( MAX_PLAYERS )[ 1 ];
+	const ghost = new RemoteCar( models[ CAR_COLORS[ 1 ] ], scene );
+	ghost.place( slot.x, slot.z, slot.angle );
+	G.remotes.set( 'ghost', ghost );
+	ui.ensureLabel( 'ghost', 'Ghost' );
+
+	setInterval( () => {
+
+		if ( G.state !== 'racing' || G.mode !== 'solo' || ! G.vehicle ) return;
+		if ( Math.random() < 0.05 ) return;                       // 5% loss
+		const snap = buildCarSnap();
+		snap.x += 2.0;                                            // drive beside us
+		const delay = 100 + Math.random() * 80;                   // 100-180 ms
+		setTimeout( () => { const g = G.remotes.get( 'ghost' ); if ( g ) g.addSnapshot( snap ); }, delay );
 
 	}, BROADCAST_MS );
 
@@ -589,6 +624,7 @@ function currentRacerCount() {
 function raceGo() {
 
 	G.state = 'racing';
+	startGhost();
 	controls.enabled = true;
 	lapTimer.start();
 	for ( const b of G.bots ) b.enabled = true;
@@ -603,7 +639,7 @@ function onMyRaceEnd( total ) {
 	G.myTotal = total;
 	controls.enabled = false;
 	ui.showToast( t( 'finished' ) );
-	submitBestLap();
+	submitRaceTime( total );
 
 	if ( G.mode === 'mp' ) {
 
@@ -617,15 +653,13 @@ function onMyRaceEnd( total ) {
 
 }
 
-function submitBestLap() {
+// The record is the FINISHED race time (3 laps, seconds, lower wins). Only a
+// completed race submits — a DNF has no time.
+function submitRaceTime( total ) {
 
 	try {
 
-		if ( lapTimer.bestLap !== null ) {
-
-			Usion.leaderboard.submit( Math.round( lapTimer.bestLap * 100 ) / 100 ).catch( () => {} );
-
-		}
+		Usion.leaderboard.submit( Math.round( total * 100 ) / 100 ).catch( () => {} );
 
 	} catch {}
 
@@ -726,7 +760,6 @@ function showResults( placements, canRematch ) {
 
 	G.state = 'results';
 	G.placements = placements;
-	submitBestLap();
 	controls.enabled = false;
 	controls.setTouchVisible( false );
 	ui.showHUD( false );
@@ -739,7 +772,7 @@ function showResults( placements, canRematch ) {
 
 	} );
 
-	ui.updateResults( rows, lapTimer.bestLap, canRematch );
+	ui.updateResults( rows, G.myTotal, canRematch );
 	ui.showResults( true );
 	loadBoards();
 
