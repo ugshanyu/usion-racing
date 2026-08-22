@@ -1,3 +1,5 @@
+import { buildClosedTrackCells } from './TileTrackLayout.js';
+
 // Circuit de Monaco centreline derived from OpenStreetMap relation 148194,
 // version 61 (2026-08-21), simplified to a maximum 0.5 metre deviation.
 // The source route measures 3,335.3 m; the FIA centreline length is 3,337 m.
@@ -8,11 +10,6 @@ export const MONACO_TRACK_ID = 'monaco';
 export const MONACO_OFFICIAL_LENGTH_METERS = 3337;
 export const MONACO_TURN_COUNT = 19;
 export const MONACO_SOURCE_LENGTH_METERS = 3335.3;
-export const MONACO_WORLD_SCALE = 0.078;
-export const MONACO_OFFSET_X = 170;
-export const MONACO_ROAD_HALF_WIDTH = 2.45;
-export const MONACO_PATH_SAMPLES = 360;
-export const MONACO_TUNNEL_RANGE = Object.freeze( [ 0.42, 0.57 ] );
 
 export const MONACO_ROUTE_METERS = Object.freeze( [
 	[ -340.47, 246.00 ], [ -345.09, 180.47 ], [ -344.80, 162.82 ], [ -343.10, 138.08 ],
@@ -60,7 +57,42 @@ export const MONACO_ROUTE_METERS = Object.freeze( [
 	[ -296.49, 438.20 ], [ -327.18, 330.73 ], [ -329.98, 317.78 ], [ -337.19, 273.42 ],
 ].map( ( point ) => Object.freeze( point ) ) );
 
-export const MONACO_ROUTE_POINTS = Object.freeze( MONACO_ROUTE_METERS.map( ( [ x, z ] ) => Object.freeze( [
-	MONACO_OFFSET_X + x * MONACO_WORLD_SCALE,
-	z * MONACO_WORLD_SCALE,
-] ) ) );
+// Arcade-grid trace of the source route. The coordinates deliberately stay on
+// the same cardinal grid as the OG circuit: buildTrack supplies the original
+// Kenney straight/corner/finish models, TrackPath follows tile centres, and
+// buildWallColliders creates the matching per-piece physics walls.
+//
+// Non-consecutive runs always have an empty cell between them so TrackPath has
+// one unambiguous two-neighbour loop. The x offset keeps the inactive course
+// clear of the OG course, whose tiles sit around x = -3…0.
+export const MONACO_TRACK_VERTICES = Object.freeze( [
+	[ 22, - 8 ], // start/finish straight
+	[ 17, - 8 ],
+	[ 17, - 5 ],
+	[ 15, - 5 ],
+	[ 15,   0 ],
+	[ 17,   0 ],
+	[ 17,   4 ],
+	[ 15,   4 ],
+	[ 15,   7 ],
+	[ 23,   7 ],
+	[ 23,   5 ],
+	[ 26,   5 ],
+	[ 26,   8 ],
+	[ 29,   8 ],
+	[ 29,   2 ],
+	[ 22,   2 ],
+	[ 22, - 1 ],
+	[ 19, - 1 ],
+	[ 19, - 5 ],
+	[ 22, - 5 ],
+	[ 22, - 3 ],
+	[ 26, - 3 ],
+	[ 26,   0 ],
+	[ 29,   0 ],
+	[ 29, - 5 ],
+	[ 27, - 5 ],
+	[ 27, - 8 ],
+].map( ( point ) => Object.freeze( point ) ) );
+
+export const MONACO_TRACK_CELLS = Object.freeze( buildClosedTrackCells( MONACO_TRACK_VERTICES ) );

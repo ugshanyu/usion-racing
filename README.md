@@ -24,9 +24,9 @@ authoritative `/ws` endpoint.
   host-selectable 3/5/10 laps and OG/Monaco courses, and `Usion.game.invite()`.
 - **Original starter-kit course** — the compact tiled loop and scenery from the
   initial racing version remains the default.
-- **Monaco GP multiplayer course** — an opt-in, arcade-scaled version of the
-  official 3.337 km / 19-turn street circuit, with harbor, tunnel, city blocks,
-  barriers, and server-synchronized track selection.
+- **Monaco GP multiplayer course** — an opt-in Monaco-inspired route assembled
+  from the same original straight, corner, finish, scenery, and collider tiles
+  as the OG course, with server-synchronized track selection.
 - **Instant solo play** (GameTok / Explore): 3-lap race against three bot drivers
   with real physics bodies (they collide with you and each other). All racers use
   the original Kenney truck models.

@@ -6,16 +6,14 @@ import { Vehicle, MAX_SPEED } from './Vehicle.js';
 import { Camera } from './Camera.js';
 import { Controls } from './Controls.js';
 import { buildTrack, computeTrackBounds, TRACK_CELLS } from './Track.js';
-import { buildCurvedWallColliders, buildWallColliders, createSphereBody } from './Physics.js';
+import { buildWallColliders, createSphereBody } from './Physics.js';
 import { SmokeTrails } from './Particles.js';
 import { DriftMarks } from './DriftMarks.js';
 import { GameAudio } from './Audio.js';
 import { LapTimer } from './LapTimer.js';
 import { ColorMapGLTFLoader } from './Loader.js';
 import { TrackPath } from './TrackPath.js';
-import { MonacoPath } from './MonacoPath.js';
-import { buildMonacoTrack } from './MonacoTrack.js';
-import { MONACO_TRACK_ID } from './MonacoLayout.js';
+import { MONACO_TRACK_CELLS, MONACO_TRACK_ID } from './MonacoLayout.js';
 import { RemoteCar } from './RemoteCar.js';
 import { Bot, BOT_NAMES, BOT_SPEEDS } from './Bots.js';
 import { Net } from './net.js';
@@ -270,6 +268,9 @@ async function init( config ) {
 	scene.fog.far = groundSize * 0.8;
 
 	ogTrackGroup = buildTrack( scene, models, null );
+	monacoTrackGroup = buildTrack( scene, models, MONACO_TRACK_CELLS );
+	monacoTrackGroup.name = 'MonacoTileTrack';
+	monacoTrackGroup.visible = false;
 
 	const probeHeight = 6;
 	const probes = new LightProbeGrid(
@@ -294,6 +295,7 @@ async function init( config ) {
 	world._OL_STATIC = OL_STATIC;
 
 	buildWallColliders( world, null, null );
+	buildWallColliders( world, null, MONACO_TRACK_CELLS );
 
 	const roadHalf = groundSize / 2;
 	rigidBody.create( world, {
@@ -306,12 +308,9 @@ async function init( config ) {
 	} );
 
 	ogPath = new TrackPath( cells );
-	monacoPath = new MonacoPath();
-	monacoTrackGroup = buildMonacoTrack( scene, monacoPath );
-	monacoTrackGroup.visible = false;
-	buildCurvedWallColliders( world, monacoPath, null );
+	monacoPath = new TrackPath( MONACO_TRACK_CELLS );
 
-	const monacoBounds = monacoPath.bounds( 4 );
+	const monacoBounds = computeTrackBounds( MONACO_TRACK_CELLS );
 	rigidBody.create( world, {
 		shape: box.create( { halfExtents: [ monacoBounds.halfWidth, 0.01, monacoBounds.halfDepth ] } ),
 		motionType: MotionType.STATIC,
@@ -449,9 +448,8 @@ async function loadModels() {
 
 function createLapTimer( trackId, laps ) {
 
-	const selectedPath = trackId === MONACO_TRACK_ID ? monacoPath : null;
-	return new LapTimer( selectedPath ? null : TRACK_CELLS, {
-		path: selectedPath,
+	const selectedCells = trackId === MONACO_TRACK_ID ? MONACO_TRACK_CELLS : TRACK_CELLS;
+	return new LapTimer( selectedCells, {
 		trackId,
 		laps,
 		onLap: () => {},

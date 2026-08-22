@@ -28,8 +28,9 @@ npm run prepare:porsche -- /path/to/911_turbo_930_improved.glb
 - License: [Open Database License 1.0](https://opendatacommons.org/licenses/odbl/1-0/)
 - Official circuit facts checked against the FIA circuit map: 3.337 km and 19 turns
 
-The route centreline was joined in race direction, rotated to start at the mapped
-start/finish node, converted from latitude/longitude to local metres, and simplified
-to a maximum 0.5 metre deviation. The game applies one uniform scale and widens the
-road for the original arcade trucks. No Formula 1, FIA, sponsor, or event logos are
-included.
+The source centreline was joined in race direction and converted from
+latitude/longitude to local metres. It is retained as a geometry reference in
+`js/MonacoLayout.js`. The playable course is a deliberately stylized orthogonal
+trace assembled from the same Kenney straight, corner, and finish tiles as the OG
+course, with the same per-tile wall collider builder. It is not a one-to-one road
+survey. No Formula 1, FIA, sponsor, or event logos are included.
