@@ -486,6 +486,7 @@ function activateTrack( requestedTrack ) {
 	}
 
 	lapTimer = createLapTimer( trackId, G.laps );
+	if ( ui ) ui.setMinimapPath( path );
 
 }
 
@@ -1171,6 +1172,8 @@ function animate() {
 	for ( const b of G.bots ) b.update( dt, lapTimer.totalLaps, G.raceClock );
 	for ( const r of G.remotes.values() ) r.update( dt );
 
+	if ( G.vehicle && ( G.state === 'countdown' || G.state === 'racing' ) ) updateRaceMinimap();
+
 	// HUD position + name labels
 	if ( G.state === 'racing' && G.vehicle ) {
 
@@ -1206,6 +1209,23 @@ function animate() {
 	updateLabels();
 
 	renderer.render( scene, cam.camera );
+
+}
+
+function updateRaceMinimap() {
+
+	_forward.set( 0, 0, 1 ).applyQuaternion( G.vehicle.container.quaternion );
+	const heading = Math.atan2( _forward.x, _forward.z );
+	const rivals = [];
+
+	for ( const bot of G.bots ) rivals.push( bot.pos );
+	for ( const remote of G.remotes.values() ) {
+
+		if ( remote.hasData || remote.container.visible ) rivals.push( remote.pos );
+
+	}
+
+	ui.updateMinimap( G.vehicle.spherePos, heading, rivals );
 
 }
 

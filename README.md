@@ -31,6 +31,8 @@ authoritative `/ws` endpoint.
   with real physics bodies (they collide with you and each other). All racers use
   the original Kenney truck models.
 - **Quick chat** — localized canned phrases + free text, rendered as bubbles over cars.
+- **Live minimap** — the active OG/Monaco route, upcoming corner sequence, local
+  heading, and rival positions stay visible in the race HUD.
 - **Mobile friendly** — floating touch joystick (from the kit), safe-area aware HUD,
   ResizeObserver-driven resize, capped DPR.
 - **i18n** — English + Mongolian.

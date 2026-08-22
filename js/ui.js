@@ -69,12 +69,23 @@ const css = `
 		display: none; justify-content: space-between; align-items: flex-start; pointer-events: none; }
 	.hud-box { background: rgba(0,0,0,0.5); border-radius: 12px; padding: 8px 12px; backdrop-filter: blur(8px);
 		-webkit-backdrop-filter: blur(8px); text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
+	.hud-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 	#hud .time { font: 700 22px/1.1 inherit; font-variant-numeric: tabular-nums; }
 	#hud .row { display: flex; gap: 10px; justify-content: space-between; font-size: 11px; opacity: 0.85;
 		font-variant-numeric: tabular-nums; }
 	#hud .label { opacity: 0.6; letter-spacing: 0.06em; }
 	#hud .pos { font: 800 26px/1 inherit; }
 	#hud .lapline { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+	#minimap { width: 116px; height: 116px; padding: 6px; border: 1px solid rgba(255,255,255,0.16);
+		background: rgba(8,10,14,0.68); box-shadow: inset 0 0 18px rgba(0,0,0,0.28); }
+	#minimap canvas { display: block; width: 100%; height: 100%; }
+	@media (max-width: 520px) {
+		#hud { left: 8px; right: 8px; }
+		#minimap { width: 96px; height: 96px; padding: 5px; }
+	}
+	@media (max-height: 520px) and (orientation: landscape) {
+		#minimap { width: 82px; height: 82px; padding: 4px; }
+	}
 	#countdown { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
 		font-size: 96px; font-weight: 800; text-shadow: 0 4px 24px rgba(0,0,0,0.5); }
 	#toast { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(96px + env(safe-area-inset-bottom));
@@ -207,8 +218,17 @@ export class UI {
 		const bestRow = this.el( 'div', 'row', left );
 		this.el( 'span', 'label', bestRow, t( 'best' ) );
 		this.bestEl = this.el( 'span', null, bestRow, formatTime( null ) );
-		const right = this.el( 'div', 'hud-box', this.hud );
-		this.posEl = this.el( 'div', 'pos', right, '' );
+		const right = this.el( 'div', 'hud-right', this.hud );
+		const positionBox = this.el( 'div', 'hud-box', right );
+		this.posEl = this.el( 'div', 'pos', positionBox, '' );
+		this.minimap = this.el( 'div', 'hud-box', right );
+		this.minimap.id = 'minimap';
+		this.minimap.setAttribute( 'role', 'img' );
+		this.minimap.setAttribute( 'aria-label', t( 'minimap' ) );
+		this.minimapCanvas = this.el( 'canvas', null, this.minimap );
+		this.minimapCanvas.setAttribute( 'aria-hidden', 'true' );
+		this.minimapPath = null;
+		this.minimapBounds = null;
 
 		// Countdown
 		this.countdown = this.el( 'div', null, this.root );
@@ -389,6 +409,153 @@ export class UI {
 		this.bestEl.textContent = formatTime( timer.bestLap );
 		const positions = t( 'positions' );
 		this.posEl.textContent = totalRacers > 1 ? ( positions[ position - 1 ] || position + '.' ) : '';
+
+	}
+
+	setMinimapPath( path ) {
+
+		this.minimapPath = path || null;
+
+		if ( ! path || ! Array.isArray( path.points ) || path.points.length < 2 ) {
+
+			this.minimapBounds = null;
+			return;
+
+		}
+
+		const xs = path.points.map( ( point ) => point.x );
+		const zs = path.points.map( ( point ) => point.z );
+		this.minimapBounds = {
+			minX: Math.min( ...xs ),
+			maxX: Math.max( ...xs ),
+			minZ: Math.min( ...zs ),
+			maxZ: Math.max( ...zs ),
+		};
+
+	}
+
+	updateMinimap( ownPosition, heading, rivals = [] ) {
+
+		const path = this.minimapPath;
+		const bounds = this.minimapBounds;
+		const canvas = this.minimapCanvas;
+		if ( ! path || ! bounds || ! ownPosition || ! canvas ) return;
+
+		const width = Math.max( 1, Math.round( canvas.clientWidth ) );
+		const height = Math.max( 1, Math.round( canvas.clientHeight ) );
+		const dpr = Math.min( window.devicePixelRatio || 1, 2 );
+		const bitmapWidth = Math.round( width * dpr );
+		const bitmapHeight = Math.round( height * dpr );
+
+		if ( canvas.width !== bitmapWidth || canvas.height !== bitmapHeight ) {
+
+			canvas.width = bitmapWidth;
+			canvas.height = bitmapHeight;
+
+		}
+
+		const context = canvas.getContext( '2d' );
+		context.setTransform( dpr, 0, 0, dpr, 0, 0 );
+		context.clearRect( 0, 0, width, height );
+
+		const padding = 7;
+		const spanX = Math.max( 1, bounds.maxX - bounds.minX );
+		const spanZ = Math.max( 1, bounds.maxZ - bounds.minZ );
+		const scale = Math.min( ( width - padding * 2 ) / spanX, ( height - padding * 2 ) / spanZ );
+		const offsetX = ( width - spanX * scale ) / 2;
+		const offsetY = ( height - spanZ * scale ) / 2;
+		const pointOnMap = ( point ) => ( {
+			x: offsetX + ( point.x - bounds.minX ) * scale,
+			y: height - offsetY - ( point.z - bounds.minZ ) * scale,
+		} );
+
+		const strokePoints = ( points ) => {
+
+			if ( points.length < 2 ) return;
+			const first = pointOnMap( points[ 0 ] );
+			context.beginPath();
+			context.moveTo( first.x, first.y );
+			for ( let index = 1; index < points.length; index ++ ) {
+
+				const point = pointOnMap( points[ index ] );
+				context.lineTo( point.x, point.y );
+
+			}
+
+		};
+
+		context.lineJoin = 'round';
+		context.lineCap = 'round';
+		strokePoints( [ ...path.points, path.points[ 0 ] ] );
+		context.strokeStyle = 'rgba(255,255,255,0.24)';
+		context.lineWidth = 7;
+		context.stroke();
+		context.strokeStyle = '#30343b';
+		context.lineWidth = 4.5;
+		context.stroke();
+		context.setLineDash( [ 2, 3 ] );
+		context.strokeStyle = 'rgba(255,255,255,0.48)';
+		context.lineWidth = 0.9;
+		context.stroke();
+		context.setLineDash( [] );
+
+		const progress = path.progress( ownPosition );
+		const lookAhead = Math.min( path.length * 0.18, 90 );
+		const upcoming = [];
+
+		for ( let index = 0; index <= 24; index ++ ) {
+
+			upcoming.push( path.pointAt( progress + lookAhead * index / 24 ) );
+
+		}
+
+		strokePoints( upcoming );
+		context.strokeStyle = '#ffbd38';
+		context.lineWidth = 2.5;
+		context.shadowColor = 'rgba(255,189,56,0.5)';
+		context.shadowBlur = 5;
+		context.stroke();
+		context.shadowBlur = 0;
+
+		const finish = pointOnMap( path.points[ 0 ] );
+		context.beginPath();
+		context.arc( finish.x, finish.y, 2.2, 0, Math.PI * 2 );
+		context.fillStyle = '#f6f7f8';
+		context.fill();
+
+		for ( const rival of rivals ) {
+
+			if ( ! rival ) continue;
+			const marker = pointOnMap( rival );
+			context.beginPath();
+			context.arc( marker.x, marker.y, 2.8, 0, Math.PI * 2 );
+			context.fillStyle = '#f5f7fa';
+			context.fill();
+			context.strokeStyle = '#141820';
+			context.lineWidth = 1.2;
+			context.stroke();
+
+		}
+
+		const player = pointOnMap( ownPosition );
+		context.save();
+		context.translate( player.x, player.y );
+		context.rotate( heading || 0 );
+		context.beginPath();
+		context.moveTo( 0, - 6 );
+		context.lineTo( 4.6, 4.5 );
+		context.lineTo( 0, 2.8 );
+		context.lineTo( - 4.6, 4.5 );
+		context.closePath();
+		context.fillStyle = '#ffbd38';
+		context.shadowColor = 'rgba(0,0,0,0.75)';
+		context.shadowBlur = 4;
+		context.fill();
+		context.shadowBlur = 0;
+		context.strokeStyle = '#11151b';
+		context.lineWidth = 1.2;
+		context.stroke();
+		context.restore();
 
 	}
 
