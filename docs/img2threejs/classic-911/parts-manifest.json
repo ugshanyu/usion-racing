@@ -1,0 +1,41 @@
+{
+  "model": "classic-911-style-coupe",
+  "source": "js/Classic911Bot.js root.userData.sculptRuntime.nodes",
+  "parts": [
+    {"name": "root", "kind": "container", "module": "Classic_911_Coupe"},
+    {"name": "body-shell", "kind": "part", "module": "Body_Shell"},
+    {"name": "cabin-shell", "kind": "part", "module": "Roof_Panel"},
+    {"name": "rolling-system", "kind": "part", "module": "Socket_Front_Axle"},
+    {"name": "glazing", "kind": "part", "module": "Windshield_Glass"},
+    {"name": "doors", "kind": "part", "module": "Door_Cutline_Left"},
+    {"name": "wheels", "kind": "part", "module": "Wheel_Front_Left"},
+    {"name": "front-lighting", "kind": "part", "module": "Headlamp_Bucket"},
+    {"name": "front-bumper", "kind": "part", "module": "Front_Painted_Bumper"},
+    {"name": "rear-deck", "kind": "part", "module": "Rear_Quarter_Surface"},
+    {"name": "rear-lighting", "kind": "part", "module": "Rear_Lamp_Backing"},
+    {"name": "rear-bumper", "kind": "part", "module": "Rear_Black_Impact_Strip"},
+    {"name": "exhaust", "kind": "part", "module": "Left_Exhaust"},
+    {"name": "mirrors", "kind": "part", "module": "Door_Mirror"},
+    {"name": "interior", "kind": "part", "module": "Dashboard"},
+    {"name": "fender-arches", "kind": "part", "module": "Painted_Wheel_Arch_Lip"},
+    {"name": "headlamp-lenses", "kind": "part", "module": "Headlamp_Lens"},
+    {"name": "amber-indicators", "kind": "part", "module": "Front_Indicator"},
+    {"name": "engine-grille", "kind": "part", "module": "Engine_Grille"},
+    {"name": "door-handles", "kind": "part", "module": "Door_Handle"},
+    {"name": "wheel-spokes", "kind": "part", "module": "Spoke_Pivot_1"},
+    {"name": "tail-lamp-segments", "kind": "part", "module": "Tail_Lamp_Cell_1"}
+  ],
+  "unnamedMeshes": 0,
+  "integralMeshes": 80,
+  "runtimeContract": {
+    "bodyNode": "Body",
+    "wheelNodes": [
+      "Wheel_Front_Left",
+      "Wheel_Front_Right",
+      "Wheel_Back_Left",
+      "Wheel_Back_Right"
+    ],
+    "sockets": ["Socket_Front_Axle", "Socket_Rear_Axle"],
+    "collision": "Existing local sphere physics remains authoritative."
+  }
+}

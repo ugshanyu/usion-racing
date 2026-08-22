@@ -1,0 +1,29 @@
+{
+  "collection": "core_3d",
+  "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+  "queries": [
+    {
+      "terms": "vehicle body variable-width loft wheel arches fenders",
+      "result": "Only a weak CylinderGeometry cross-section match was returned. The body topology therefore requires subject-specific authoring from the admitted side, front, and three-quarter views."
+    },
+    {
+      "terms": "painted metal clearcoat glass rubber lens chrome",
+      "matches": [
+        "core.pbr-clearcoat",
+        "core.pbr-opacity-alpha",
+        "core.shader-mapping-meshphysicalmaterial-core-pbr-fields",
+        "core.pbr-metalness"
+      ],
+      "decision": "Use MeshPhysicalMaterial for the red automotive paint and transparent glass; use separate dielectric rubber, lens, and metallic trim materials."
+    },
+    {
+      "terms": "action-ready wheel pivots axle sockets collider vehicle",
+      "matches": [
+        "core.runtime-hierarchy",
+        "core.shader-mapping-uvcoordinate-system-conversion-attachment-hierarchy"
+      ],
+      "decision": "Preserve independently named wheel pivot groups, add axle sockets and collider metadata, and expose a stable root runtime hierarchy."
+    }
+  ],
+  "conclusion": "The local evidence materially informs materials and action-ready hierarchy. No suitable vehicle-body template exists in the local collection, so geometry must be authored from the four admitted references."
+}

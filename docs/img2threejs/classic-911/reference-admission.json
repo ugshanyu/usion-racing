@@ -1,0 +1,51 @@
+{
+  "workflow": "img2threejs-1.4.4",
+  "primaryReference": "references/front-three-quarter.png",
+  "rejectedSource": {
+    "path": "../concepts/classic-911-bot-reference.png",
+    "admitted": false,
+    "reason": "The four-view sheet was rejected because the largest connected foreground blob was 0.54, below the 0.60 admission threshold. It must not be treated as one reconstruction image."
+  },
+  "admittedViews": [
+    {
+      "viewpoint": "front-three-quarter",
+      "path": "references/front-three-quarter.png",
+      "admitted": true,
+      "width": 627,
+      "height": 627,
+      "foregroundCoverage": 0.3984,
+      "largestComponentFraction": 0.9989,
+      "pHash": "16932682034293285074"
+    },
+    {
+      "viewpoint": "rear-three-quarter",
+      "path": "references/rear-three-quarter.png",
+      "admitted": true,
+      "width": 627,
+      "height": 627,
+      "foregroundCoverage": 0.3677,
+      "largestComponentFraction": 0.989,
+      "pHash": "16927597832652239009"
+    },
+    {
+      "viewpoint": "side",
+      "path": "references/side.png",
+      "admitted": true,
+      "width": 627,
+      "height": 627,
+      "foregroundCoverage": 0.3313,
+      "largestComponentFraction": 1.0,
+      "pHash": "17244546789718192528"
+    },
+    {
+      "viewpoint": "front",
+      "path": "references/front.png",
+      "admitted": true,
+      "width": 627,
+      "height": 627,
+      "foregroundCoverage": 0.3214,
+      "largestComponentFraction": 0.9051,
+      "pHash": "17737909465373534368"
+    }
+  ]
+}

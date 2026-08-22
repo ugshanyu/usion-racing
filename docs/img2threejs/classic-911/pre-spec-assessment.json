@@ -1,0 +1,642 @@
+{
+  "targetName": "Classic 911 Style Coupe",
+  "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/references/front-three-quarter.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "rear-engine two-door sports coupe",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "faceted low-poly surfacing",
+        "rounded classic coupe silhouette",
+        "raised front fender crowns",
+        "fastback roof arc"
+      ],
+      "structureKind": [
+        "continuous unibody shell",
+        "separate glazed cabin",
+        "four articulated wheel assemblies",
+        "separate lighting and bumper hardware"
+      ],
+      "motionPotential": [
+        "root vehicle translation and yaw",
+        "independent wheel rotation",
+        "front steering pivots"
+      ],
+      "materialFamilies": [
+        "clear-coated red automotive paint",
+        "smoked transparent glass",
+        "matte black rubber",
+        "brushed silver wheel metal",
+        "emissive and transparent lamp lenses",
+        "black plastic trim"
+      ],
+      "notes": "The admitted front, side, front-three-quarter, and rear-three-quarter views describe one stylized classic rear-engine coupe. Geometry should match the concept sheet rather than claim manufacturing accuracy or use trademarked badges."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 2,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 6,
+        "mesoComponents": 24,
+        "microFeatureGroups": 12,
+        "materialLayers": 8,
+        "repetitionSystems": 5
+      },
+      "reasoning": [
+        "The identity depends on a compound side silhouette: long low hood, upright windshield, near-flat roof crown, and continuous fastback rear arc.",
+        "Front and rear wheel openings must be carved negative spaces with painted arch lips; placing wheels against an uncut body is a reference-breaking shortcut.",
+        "The front view requires a wide low stance, exposed round headlamps embedded in raised fender crowns, a narrow black bumper strip, and small amber indicators.",
+        "The rear view requires a full-width dark red lamp band, horizontal engine grille, black bumper guards, and a single left exhaust outlet.",
+        "Five-spoke wheel repetition, separate wheel pivots, and stable axle sockets are required for both visual identity and game animation."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Complex is required because the four-view identity depends on a continuous compound body surface, true wheel-arch negative spaces, a shaped glazed cabin, repeated wheel hardware, layered PBR materials, and action-ready wheel pivots."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "grid-4x4 plus admitted side/front/rear review",
+      "targetMinDetails": 16,
+      "details": [
+        {
+          "id": "paint-clearcoat-highlight",
+          "kind": "gloss",
+          "description": "Sharp studio highlights ride over a saturated red base coat on the hood, roof, fenders, and doors.",
+          "region": {
+            "x": 0.2,
+            "y": 0.32,
+            "width": 0.66,
+            "height": 0.38,
+            "units": "normalized"
+          },
+          "scale": "macro-to-meso",
+          "affects": "surface response",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "body-paint/highlight-clearcoat"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r1c2.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "hood-center-valley",
+          "kind": "ridge",
+          "description": "A shallow center valley and two faceted shoulder planes run from the cowl toward the front bumper.",
+          "region": {
+            "x": 0.08,
+            "y": 0.43,
+            "width": 0.55,
+            "height": 0.23,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "geometry and highlights",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "body-shell/hood-center-valley"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r2c1.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "front-round-headlamp-buckets",
+          "kind": "contour",
+          "description": "Two round headlamps are embedded into raised painted fender crowns rather than floating in front of the body.",
+          "region": {
+            "x": 0.03,
+            "y": 0.47,
+            "width": 0.62,
+            "height": 0.26,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "silhouette and lighting identity",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-lighting/headlamp-bucket-contour"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r2c0.png",
+          "confidence": 0.98
+        },
+        {
+          "id": "front-black-impact-strip",
+          "kind": "linework",
+          "description": "A narrow black impact strip spans the front bumper below the painted nose.",
+          "region": {
+            "x": 0.01,
+            "y": 0.65,
+            "width": 0.68,
+            "height": 0.1,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "front horizontal layering",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-bumper/black-impact-strip"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r2c1.png",
+          "confidence": 0.97
+        },
+        {
+          "id": "front-amber-indicators",
+          "kind": "emissive",
+          "description": "Small rectangular amber indicator lenses sit inside the front bumper near each corner.",
+          "region": {
+            "x": 0.02,
+            "y": 0.64,
+            "width": 0.62,
+            "height": 0.13,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "front lighting signature",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-lighting/amber-indicators"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r2c0.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "front-wheel-arch-opening",
+          "kind": "hole",
+          "description": "The front tire occupies a real cut-out negative space with a red faceted arch lip following the upper tire.",
+          "region": {
+            "x": 0.48,
+            "y": 0.56,
+            "width": 0.23,
+            "height": 0.3,
+            "units": "normalized"
+          },
+          "scale": "macro",
+          "affects": "side silhouette and tire clearance",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "body-shell/front-wheel-arch"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r2c2.png",
+          "confidence": 0.98
+        },
+        {
+          "id": "rear-wheel-arch-opening",
+          "kind": "hole",
+          "description": "The rear tire is enclosed by a separate flared painted arch with a smaller visible gap than the old model.",
+          "region": {
+            "x": 0.82,
+            "y": 0.51,
+            "width": 0.18,
+            "height": 0.3,
+            "units": "normalized"
+          },
+          "scale": "macro",
+          "affects": "rear quarter silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "body-shell/rear-wheel-arch"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r2c3.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "five-spoke-wheel-star",
+          "kind": "ridge",
+          "description": "Each wheel exposes five thick silver spokes, a recessed dark barrel, and a circular center cap.",
+          "region": {
+            "x": 0.48,
+            "y": 0.61,
+            "width": 0.5,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "repeated wheel identity",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "wheels/five-spoke-star"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r2c2.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "windshield-black-frame",
+          "kind": "contour",
+          "description": "A thick charcoal frame outlines the trapezoidal windshield and separates it cleanly from the red A-pillars and roof.",
+          "region": {
+            "x": 0.3,
+            "y": 0.29,
+            "width": 0.44,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "cabin proportion",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "glazing/windshield-frame"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r1c1.png",
+          "confidence": 0.98
+        },
+        {
+          "id": "rear-quarter-window-taper",
+          "kind": "contour",
+          "description": "The side glass terminates in a rounded triangular rear quarter window under the fastback arc.",
+          "region": {
+            "x": 0.67,
+            "y": 0.31,
+            "width": 0.24,
+            "height": 0.27,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "side and rear-three-quarter identity",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "glazing/rear-quarter-window"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r1c3.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "door-cutline",
+          "kind": "seam",
+          "description": "A thin dark cutline follows the front edge, rocker, and curved rear edge of the long coupe door.",
+          "region": {
+            "x": 0.54,
+            "y": 0.44,
+            "width": 0.31,
+            "height": 0.29,
+            "units": "normalized"
+          },
+          "scale": "micro-to-meso",
+          "affects": "body panel readability",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "doors/door-cutline"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r2c2.png",
+          "confidence": 0.92
+        },
+        {
+          "id": "black-door-handle",
+          "kind": "ridge",
+          "description": "A small horizontal black handle sits high on the door behind the side mirror.",
+          "region": {
+            "x": 0.72,
+            "y": 0.47,
+            "width": 0.08,
+            "height": 0.05,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "side detail",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "doors/black-door-handle"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/detail-zones/zone-r1c3.png",
+          "confidence": 0.91
+        },
+        {
+          "id": "rear-engine-grille-slats",
+          "kind": "groove",
+          "description": "Closely spaced horizontal black slats fill a recessed grille below the rear window.",
+          "region": {
+            "x": 0.15,
+            "y": 0.35,
+            "width": 0.42,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "micro repetition",
+          "affects": "rear-deck identity",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "rear-deck/engine-grille-slats"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/references/rear-three-quarter.png",
+          "confidence": 0.98
+        },
+        {
+          "id": "full-width-rear-lamp-band",
+          "kind": "emissive",
+          "description": "A segmented dark-red lamp band spans nearly the entire tail between black end bezels.",
+          "region": {
+            "x": 0.04,
+            "y": 0.56,
+            "width": 0.78,
+            "height": 0.13,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "rear lighting signature",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "rear-lighting/full-width-lamp-band"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/references/rear-three-quarter.png",
+          "confidence": 0.99
+        },
+        {
+          "id": "rear-bumper-guards",
+          "kind": "ridge",
+          "description": "Two chunky black vertical guards project from the rear bumper strip.",
+          "region": {
+            "x": 0.18,
+            "y": 0.65,
+            "width": 0.5,
+            "height": 0.18,
+            "units": "normalized"
+          },
+          "scale": "meso repetition",
+          "affects": "rear bumper silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "rear-bumper/bumper-guards"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/references/rear-three-quarter.png",
+          "confidence": 0.97
+        },
+        {
+          "id": "left-exhaust-mouth",
+          "kind": "hole",
+          "description": "A single dark circular exhaust outlet exits below the left side of the rear bumper.",
+          "region": {
+            "x": 0.05,
+            "y": 0.72,
+            "width": 0.1,
+            "height": 0.1,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "rear lower detail",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "exhaust/left-exhaust-mouth"
+          },
+          "evidenceRef": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/references/rear-three-quarter.png",
+          "confidence": 0.98
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0,
+      "proportions": {
+        "headUnit": 0,
+        "torso": 0,
+        "legs": 0,
+        "shoulderWidth": 0,
+        "hipWidth": 0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0,
+        "eyeSpacing": 0,
+        "noseBase": 0,
+        "mouthLine": 0,
+        "hairline": 0
+      },
+      "features": [],
+      "confidence": 0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/references/front-three-quarter.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "At the admitted side view the hood, windshield, roof, fastback, wheelbase, wheel diameter, and wheel-arch openings read as the same stylized coupe rather than a generic sports car.",
+      "At the admitted front view the wide low stance, fender crowns, inset round headlamps, bumper strip, and amber indicators align with the concept.",
+      "At the admitted rear three-quarter view the roof-to-tail arc, rear grille, full-width lamp band, bumper guards, and left exhaust are present and correctly layered.",
+      "Wheels expose five spokes and remain independently named pivot groups compatible with the existing game animation.",
+      "Automotive paint, glass, rubber, metallic wheels, black trim, and lamp lenses remain visually distinct under neutral and grazing light."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 8,
+      "microFeatureGroups": 5,
+      "materialLayers": 3,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "The side profile explicitly controls hood height, windshield rake, roof crown, fastback falloff, tail height, wheelbase, overhangs, and ground clearance.",
+          "The front profile explicitly controls track width, fender crown height, hood valley, headlamp centers, and cabin taper."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Body shell, cabin/glazing, four wheel pivots, lighting, bumpers, rear grille, and interior are separate named branches.",
+          "Door seams, hood shut line, fender-to-bumper boundaries, and glass frames are explicit local features rather than painted suggestions."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Each wheel pivot attaches to a named axle socket with local center, rotation axis, overlap, and gap tolerance.",
+          "Mirrors, bumper guards, exhaust, headlamps, indicators, and rear grille attach to named body sockets with explicit local transforms."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "The red clear-coated body, smoked glass, tire rubber, silver spokes, black trim, lamp glass, and amber indicators have separate material contracts.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived red paint, charcoal glass, near-black trim, dark rubber, silver wheel, ivory headlamp, amber indicator, and dark-red tail-lamp palette.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "authoringInstruction": "Fill observed object class, complexity reasoning, featureGroups, visualDeltaChecks, and unknowns before generating or implementing ObjectSculptSpec.",
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Classic 911 Style Coupe vehicle body variable-width loft wheel arches fenders painted metal clearcoat glass rubber lens chrome action-ready wheel pivots axle sockets collider vehicle",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.runtime-hierarchy",
+        "file_path": "grimoire/readiness/action_rigging.md",
+        "heading": "Hierarchy Pattern",
+        "key_path": null,
+        "score": 15.968278256649,
+        "snippets": [
+          "An action-ready model uses a root, component pivot groups, visual meshes, sockets, collider metadata or proxies, and destruction-group metadata."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/readiness/action_rigging.md",
+            "heading": "Hierarchy Pattern",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/readiness/action_rigging.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-clearcoat",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[4]",
+        "score": 8.308875445178,
+        "snippets": [
+          "... secondary highlight sitting on top of a duller or differently-colored base layer; Common on Custom Paint Job / Gunsmith style finishes with a glossy topcoat over illustrative artwork Dấu hiệu nhận diện: Có một điểm sáng thứ cấp sắc nét nằm ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[4]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-uvcoordinate-system-conversion-attachment-hierarchy",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[14]",
+        "score": 4.37507566929,
+        "snippets": [
+          "... appears mirrored or flipped sideways after import signals a handedness mismatch; Attachment points behave like named sockets/joints (Unreal sockets, USD UsdPhysicsFixedJoint, 'ghost links') — a local offset+rotation relative to a parent ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[14]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

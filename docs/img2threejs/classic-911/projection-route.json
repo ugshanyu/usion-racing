@@ -1,0 +1,12 @@
+{
+  "decision": "skip-photo-projection",
+  "reason": "The admitted references show unpatterned red automotive paint, smoked glass, black rubber/plastic, silver wheels, and simple lamp lenses. There are no decals, graphics, fabric patterns, or unique photographic textures that need camera-pose projection. Projecting any single view would bake its studio lighting and contradict the other admitted angles.",
+  "implementation": "Reconstruct the identity in geometry and use evidence-derived procedural PBR materials. Keep albedo, roughness, metalness, transmission/opacity, emissive response, and clearcoat independent.",
+  "requiredGeometryEvidence": [
+    "side silhouette and wheel openings from references/side.png",
+    "track width, fender crowns, and headlamp placement from references/front.png",
+    "compound volumes from references/front-three-quarter.png",
+    "fastback, engine grille, lamp band, bumper guards, and exhaust from references/rear-three-quarter.png"
+  ],
+  "limitation": "Because the source is a stylized AI concept rather than calibrated photography, material values and dimensions remain art-directed estimates."
+}

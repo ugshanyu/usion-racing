@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 
-const INTERP_DELAY = 120;   // render this far in the past (ms) to absorb jitter
-const SNAP_KEEP = 1000;     // drop snapshots older than this (ms)
+const MAX_EXTRAPOLATION_MS = 180;
+const SNAP_KEEP = 1500;
+const TELEPORT_DIST_SQ = 64;
 
 function lerpAngle( a, b, t ) {
 
@@ -12,9 +13,24 @@ function lerpAngle( a, b, t ) {
 
 }
 
-// A remote player's truck: no physics body — renders a snapshot buffer ~120 ms
-// in the past, interpolating position and smoothing heading (never
-// extrapolating angles). Exposes pos/vel for the local collision response.
+function finite( value ) {
+
+	return typeof value === 'number' && Number.isFinite( value );
+
+}
+
+function correctionRate( distance ) {
+
+	if ( distance < 0.1 ) return 3;
+	if ( distance < 0.5 ) return 8;
+	if ( distance < 2 ) return 15;
+	return 24;
+
+}
+
+// Remote trucks have no shared physics body. Each observer dead-reckons the
+// owner's latest velocity every frame, then smoothly removes drift toward the
+// newest owner-authoritative transform. Collision response remains local.
 export class RemoteCar {
 
 	constructor( model, scene ) {
@@ -41,17 +57,22 @@ export class RemoteCar {
 
 		} );
 
-		this.snapshots = [];        // { t, x, y, z, h, vx, vz }
-		this.pos = new THREE.Vector3( 0, 0, 0 );
+		this.snapshots = [];
+		this.pos = new THREE.Vector3();
+		this.target = new THREE.Vector3();
 		this.vel = new THREE.Vector3();
+		this.ownerVel = new THREE.Vector3();
 		this.heading = 0;
+		this.angularVelocity = 0;
+		this.ownerAngularVelocity = 0;
 		this.speed = 0;
 		this.lap = 1;
 		this.raceDist = - Infinity;
-		this.finished = false;
 		this.gone = false;
 		this.hasData = false;
 		this.wheelSpin = 0;
+		this.lastQ = - 1;
+
 
 		this.container.visible = false;
 		scene.add( this.container );
@@ -61,23 +82,53 @@ export class RemoteCar {
 	place( x, z, angle ) {
 
 		this.pos.set( x, 0, z );
+		this.target.copy( this.pos );
 		this.heading = angle;
-		this.container.position.set( x, 0, z );
+		this.container.position.copy( this.pos );
 		this.container.rotation.set( 0, angle, 0 );
 		this.container.visible = true;
 		this.snapshots.length = 0;
+		this.vel.set( 0, 0, 0 );
+		this.ownerVel.set( 0, 0, 0 );
+		this.angularVelocity = 0;
+		this.ownerAngularVelocity = 0;
 
 	}
 
-	addSnapshot( d ) {
+	addSnapshot( data ) {
 
-		const t = performance.now();
-		this.snapshots.push( { t, x: d.x, y: d.y || 0, z: d.z, h: d.h, vx: d.vx || 0, vz: d.vz || 0 } );
+		if ( ! data ) return;
+		if ( ! [ data.x, data.y ?? 0, data.z, data.h, data.vx ?? 0, data.vy ?? 0, data.vz ?? 0, data.av ?? 0 ].every( finite ) ) return;
 
-		while ( this.snapshots.length > 2 && t - this.snapshots[ 0 ].t > SNAP_KEEP ) this.snapshots.shift();
+		if ( finite( data.q ) ) {
 
-		if ( typeof d.l === 'number' ) this.lap = d.l;
-		if ( typeof d.rd === 'number' ) this.raceDist = d.rd;
+			if ( data.q <= this.lastQ ) return;
+			this.lastQ = data.q;
+
+		}
+
+		const arrival = Date.now();
+		const serverTime = finite( data.st ) ? data.st : arrival;
+		this.snapshots.push( {
+			t: serverTime,
+			receivedAt: arrival,
+			lead: Math.max( 0, Math.min( MAX_EXTRAPOLATION_MS, data.lead ?? 0 ) ),
+			x: data.x,
+			y: data.y ?? 0,
+			z: data.z,
+			h: data.h,
+			vx: data.vx ?? 0,
+			vy: data.vy ?? 0,
+			vz: data.vz ?? 0,
+			av: data.av ?? 0,
+		} );
+
+		while ( this.snapshots.length > 2 && serverTime - this.snapshots[ 0 ].t > SNAP_KEEP ) this.snapshots.shift();
+
+		if ( finite( data.l ) ) this.lap = data.l;
+		if ( finite( data.rd ) ) this.raceDist = data.rd;
+		this.ownerVel.set( data.vx ?? 0, data.vy ?? 0, data.vz ?? 0 );
+		this.ownerAngularVelocity = data.av ?? 0;
 		this.hasData = true;
 		this.container.visible = true;
 
@@ -87,48 +138,45 @@ export class RemoteCar {
 
 		if ( ! this.hasData || this.snapshots.length === 0 ) return;
 
-		const renderT = performance.now() - INTERP_DELAY;
-		const snaps = this.snapshots;
+		const newest = this.snapshots[ this.snapshots.length - 1 ];
+		const ahead = Math.max( 0, Math.min( newest.lead + Date.now() - newest.receivedAt, MAX_EXTRAPOLATION_MS ) ) / 1000;
+		const headingTarget = newest.h + newest.av * ahead;
 
-		let a = snaps[ 0 ], b = snaps[ snaps.length - 1 ];
+		this.target.set(
+			newest.x + newest.vx * ahead,
+			newest.y + newest.vy * ahead,
+			newest.z + newest.vz * ahead,
+		);
 
-		for ( let i = 0; i < snaps.length - 1; i ++ ) {
+		// Continue the remote simulation between packets. New snapshots correct
+		// accumulated position error without making normal steering look like a
+		// series of network snaps.
+		this.vel.lerp( this.ownerVel, 1 - Math.exp( - 18 * dt ) );
+		this.angularVelocity += ( this.ownerAngularVelocity - this.angularVelocity ) * ( 1 - Math.exp( - 18 * dt ) );
+		this.pos.addScaledVector( this.vel, dt );
+		this.heading += this.angularVelocity * dt;
 
-			if ( snaps[ i ].t <= renderT && snaps[ i + 1 ].t >= renderT ) {
+		const driftSq = this.pos.distanceToSquared( this.target );
 
-				a = snaps[ i ];
-				b = snaps[ i + 1 ];
-				break;
+		if ( driftSq > TELEPORT_DIST_SQ ) {
 
-			}
-
-		}
-
-		let x, y, z, h;
-
-		if ( b.t > a.t && renderT >= a.t && renderT <= b.t ) {
-
-			const t = ( renderT - a.t ) / ( b.t - a.t );
-			x = a.x + ( b.x - a.x ) * t;
-			y = a.y + ( b.y - a.y ) * t;
-			z = a.z + ( b.z - a.z ) * t;
-			h = lerpAngle( a.h, b.h, t );
+			// A respawn/teleport must not spend seconds crossing the track. Ordinary
+			// racing drift is always handled by the smooth path below.
+			this.pos.copy( this.target );
+			this.heading = headingTarget;
 
 		} else {
 
-			// Ahead of the newest snapshot: hold position, never extrapolate.
-			x = b.x; y = b.y; z = b.z; h = b.h;
+			const drift = Math.sqrt( driftSq );
+			this.pos.lerp( this.target, 1 - Math.exp( - correctionRate( drift ) * dt ) );
+			this.heading = lerpAngle( this.heading, headingTarget, 1 - Math.exp( - correctionRate( drift ) * 0.8 * dt ) );
 
 		}
 
-		this.vel.set( b.vx, 0, b.vz );
-		this.speed = Math.hypot( b.vx, b.vz );
-		this.pos.set( x, y, z );
+		this.speed = this.vel.length();
 
-		this.container.position.set( x, y, z );
-		this.heading = lerpAngle( this.heading, h, 1 - Math.exp( - 12 * dt ) );
+		this.container.position.copy( this.pos );
 		this.container.rotation.set( 0, this.heading, 0 );
-
 		this.wheelSpin += this.speed * dt * 2.5;
 
 		for ( const wheel of this.wheels ) wheel.rotation.x = this.wheelSpin;

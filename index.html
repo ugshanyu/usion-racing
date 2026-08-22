@@ -11,6 +11,77 @@
 		canvas { display: block; touch-action: none; }
 		#ui { position: absolute; inset: 0; pointer-events: none; z-index: 20;
 			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #fff; }
+
+		#loading-screen {
+			position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; overflow: hidden;
+			box-sizing: border-box; padding: max(28px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+				max(28px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+			background:
+				radial-gradient(circle at 78% 18%, rgba(255, 187, 51, 0.18), transparent 30%),
+				linear-gradient(135deg, #16191e 0%, #090b0e 58%, #11141a 100%);
+			color: #f7f4ed; font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+			opacity: 1; visibility: visible; transition: opacity 420ms ease, visibility 420ms step-end;
+		}
+		#loading-screen::before {
+			content: ''; position: absolute; inset: -35%; opacity: 0.16; transform: rotate(-12deg);
+			background-image: repeating-linear-gradient(90deg, transparent 0 46px, rgba(255,255,255,0.1) 46px 48px);
+		}
+		#loading-screen::after {
+			content: ''; position: absolute; left: -10%; right: -10%; bottom: 11%; height: 64px; opacity: 0.18;
+			background-color: #fff;
+			background-image:
+				linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%),
+				linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%);
+			background-position: 0 0, 32px 32px; background-size: 64px 64px; transform: rotate(-4deg);
+		}
+		#loading-screen.is-ready { opacity: 0; visibility: hidden; pointer-events: none; }
+		.loading-shell { position: relative; z-index: 1; width: min(580px, 100%); }
+		.loading-kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+			font: 800 11px/1.2 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			letter-spacing: 0.28em; color: #ffbd38; text-transform: uppercase; }
+		.loading-kicker::before { content: ''; width: 42px; height: 3px; background: #ffbd38; }
+		.loading-title { margin: 0; font-size: clamp(52px, 15vw, 104px); line-height: 0.78; letter-spacing: -0.035em;
+			font-style: italic; text-transform: uppercase; text-shadow: 0 10px 28px rgba(0,0,0,0.52); }
+		.loading-title span { display: block; color: #ffbd38; }
+		.loading-route { display: block; width: min(430px, 88%); height: auto; margin: 28px 0 24px; overflow: visible; }
+		.loading-route .route-shadow { fill: none; stroke: rgba(0,0,0,0.5); stroke-width: 18; stroke-linecap: round; }
+		.loading-route .route-line { fill: none; stroke: #f5f1e8; stroke-width: 8; stroke-linecap: round;
+			stroke-dasharray: 16 12; animation: loader-road 900ms linear infinite; }
+		.loading-route .route-truck { fill: #ffbd38; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.42)); }
+		.loading-row { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; }
+		.loading-lights { display: flex; gap: 6px; padding: 7px 9px; border: 1px solid rgba(255,255,255,0.16);
+			border-radius: 999px; background: rgba(0,0,0,0.4); }
+		.loading-lights i { width: 9px; height: 9px; border-radius: 50%; background: #444a53; animation: loader-light 1.05s infinite; }
+		.loading-lights i:nth-child(2) { animation-delay: 140ms; }
+		.loading-lights i:nth-child(3) { animation-delay: 280ms; }
+		.loading-copy { min-width: 0; }
+		.loading-status { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+			font: 800 12px/1.2 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			letter-spacing: 0.13em; text-transform: uppercase; }
+		.loading-bar { height: 4px; margin-top: 9px; overflow: hidden; background: rgba(255,255,255,0.14); }
+		.loading-bar::after { content: ''; display: block; width: 42%; height: 100%; background: #ffbd38;
+			box-shadow: 0 0 16px rgba(255,189,56,0.72); animation: loader-progress 1.15s ease-in-out infinite; }
+		.loading-meta { margin-top: 14px; font: 700 10px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			letter-spacing: 0.16em; color: rgba(255,255,255,0.48); text-transform: uppercase; }
+		#loading-screen.is-error .loading-lights i { animation: none; background: #e85f4d; }
+		#loading-screen.is-error .loading-bar::after { width: 100%; animation: none; background: #e85f4d; }
+
+		@keyframes loader-road { to { stroke-dashoffset: -28; } }
+		@keyframes loader-light { 0%, 24%, 100% { background: #444a53; box-shadow: none; }
+			35%, 64% { background: #ffbd38; box-shadow: 0 0 12px rgba(255,189,56,0.9); } }
+		@keyframes loader-progress { 0% { transform: translateX(-110%); } 100% { transform: translateX(260%); } }
+
+		@media (max-width: 480px) {
+			.loading-shell { width: min(360px, 100%); }
+			.loading-title { font-size: clamp(54px, 21vw, 78px); }
+			.loading-route { margin: 24px 0 22px; width: 100%; }
+			.loading-row { gap: 12px; }
+			.loading-meta { font-size: 9px; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			#loading-screen, .loading-route .route-line, .loading-lights i, .loading-bar::after { animation: none; transition: none; }
+			.loading-bar::after { width: 68%; transform: none; }
+		}
 	</style>
 	<script src="https://usions.com/usion-sdk.js"></script>
 	<script type="importmap">
@@ -24,6 +95,25 @@
 	</script>
 </head>
 <body>
+	<div id="loading-screen" role="status" aria-live="polite" aria-label="Loading Usion Racing">
+		<div class="loading-shell">
+			<div class="loading-kicker">Original grid edition</div>
+			<h1 class="loading-title"><span>Usion</span> Racing</h1>
+			<svg class="loading-route" viewBox="0 0 460 132" aria-hidden="true">
+				<path class="route-shadow" d="M18 92 C56 22 126 18 170 58 S248 126 306 82 S360 22 442 46" />
+				<path class="route-line" d="M18 92 C56 22 126 18 170 58 S248 126 306 82 S360 22 442 46" />
+				<path class="route-truck" d="M367 20 h38 l12 13 h19 v25 h-9 a14 14 0 0 1-28 0 h-24 a14 14 0 0 1-28 0 h-9 v-25 h23z" />
+			</svg>
+			<div class="loading-row">
+				<div class="loading-lights" aria-hidden="true"><i></i><i></i><i></i></div>
+				<div class="loading-copy">
+					<span id="loading-status" class="loading-status">Contacting race control</span>
+					<div class="loading-bar" aria-hidden="true"></div>
+				</div>
+			</div>
+			<div class="loading-meta">Original track · Four trucks · Live multiplayer</div>
+		</div>
+	</div>
 	<div id="ui"></div>
 	<script type="module" src="js/main.js"></script>
 </body>

@@ -4,5 +4,23 @@
 	"private": true,
 	"type": "module",
 	"description": "Multiplayer racing mini-game for Usion — based on mrdoob/Starter-Kit-Racing",
-	"license": "MIT"
+	"license": "MIT",
+	"scripts": {
+		"dev": "node server/dev.js",
+		"start": "node server/index.js",
+		"test": "node --test test/*.test.js",
+		"check": "node --check js/TrackLayout.js && node --check js/DriftCourseLayout.js && node --check js/CurvedTrackPath.js && node --check js/CurvedTrack.js && node --check js/ImportedCoupe.js && node --check js/net.js && node --check js/RemoteCar.js && node --check js/main.js && node --check server/index.js && node --check server/Room.js && node --check scripts/prepare-porsche-model.mjs",
+		"prepare:porsche": "node scripts/prepare-porsche-model.mjs",
+		"register:usion": "node scripts/register-usion.mjs",
+		"publish:usion": "node scripts/publish-usion.mjs"
+	},
+	"devDependencies": {
+		"@gltf-transform/core": "^4.4.2",
+		"@gltf-transform/extensions": "^4.4.2",
+		"@gltf-transform/functions": "^4.4.2"
+	},
+	"dependencies": {
+		"jose": "^5.10.0",
+		"ws": "^8.18.3"
+	}
 }

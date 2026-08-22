@@ -4,21 +4,29 @@
 based on [mrdoob/Starter-Kit-Racing](https://github.com/mrdoob/Starter-Kit-Racing)
 (a three.js port of Kenney's Starter Kit Racing).
 
-Live: https://usion-racing.vercel.app
+The multiplayer build must run as a single WebSocket-capable service (the room
+state is held in-process). A static-only Vercel deployment cannot host the
+authoritative `/ws` endpoint.
 
 ## What was added on top of the starter kit
 
 - **Usion SDK integration** — identity, launch modes, leaderboard (best lap, lower wins),
-  Game Center match results (`Usion.game.reportResult`).
-- **Multiplayer over the platform relay** (2–4 players, one truck color per seat):
-  each client simulates its own car locally (instant input feel) and broadcasts
-  position/velocity at 15 Hz; remote cars render ~120 ms in the past with snapshot
-  interpolation. Car-to-car hits apply a symmetric impulse on each client's own
-  physics body — everyone bounces.
+  and Game Center match results (signed direct-server result submission, with
+  `Usion.game.reportResult` retained for relay fallback rooms).
+- **Direct, server-sequenced multiplayer** (2–4 players, one truck color per
+  seat): each client keeps responsive local vehicle physics and publishes its
+  freshest state at 60 Hz. The room validates monotonic updates and broadcasts
+  compact movement deltas at 60 Hz, plus reliable metadata keyframes. Remote
+  cars dead-reckon position, height, velocity, and turn rate locally, then apply
+  drift-sensitive smooth correction toward the owner's reported transform.
+  Car-to-car collision response intentionally remains a local calculation.
 - **Waiting room** — roster with avatars, per-player READY, host-only start,
   `Usion.game.invite()`, play-with-bots escape hatch.
+- **Original starter-kit course** — the compact tiled loop and scenery from the
+  initial racing version.
 - **Instant solo play** (GameTok / Explore): 3-lap race against three bot drivers
-  with real physics bodies (they collide with you and each other).
+  with real physics bodies (they collide with you and each other). All racers use
+  the original Kenney truck models.
 - **Quick chat** — localized canned phrases + free text, rendered as bubbles over cars.
 - **Mobile friendly** — floating touch joystick (from the kit), safe-area aware HUD,
   ResizeObserver-driven resize, capped DPR.
@@ -28,22 +36,50 @@ Live: https://usion-racing.vercel.app
 
 3 laps. Placements = order of finish-line crossings (sequenced `finished` actions,
 identical on every client). Best lap submits to the leaderboard (ascending — lower
-is better). The host reports the match result so a result card lands back in the
-chat the game started from.
+is better). Direct rooms submit the signed match result from the server so a
+result card lands back in the originating chat; relay fallback rooms use the host.
 
 ## Development
 
-Static site — no build step. Serve the folder and open it:
+Install dependencies and start the game + room server:
 
 ```bash
-npx serve .
+npm install
+npm run dev
 ```
 
-Outside the Usion host the SDK is stubbed and the game boots straight into a solo
-bot race. `editor.html` (from the starter kit) still works for building tracks.
+For a local two-player test, open:
+
+- `http://localhost:3017/?multiplayer=1&room=test&player=one`
+- `http://localhost:3017/?multiplayer=1&room=test&player=two`
+
+Run the protocol integration test with `npm test`. Outside the Usion host, a URL
+without the multiplayer flags still boots into a solo bot race. `editor.html`
+(from the starter kit) still works for building tracks.
+
+## Production
+
+Deploy the included Dockerfile to a WebSocket-capable host. Required production
+variables are `SERVICE_ID`, `SIGNING_SECRET`, and `API_URL`; `JWKS_URL` and
+`SIGNING_KEY_ID` are optional overrides. Keep exactly one replica unless the
+room store is moved out of process.
+
+Register the deployment as a Usion direct game with:
+
+```bash
+USION_API_TOKEN=... GAME_URL=https://your-game.example npm run register:usion
+```
+
+Import the generated `.env.railway.generated` values into the host, redeploy,
+then publish with `USION_SERVICE_ID`, `USION_API_TOKEN`, and `GAME_URL` via
+`npm run publish:usion`.
 
 ## Credits
 
 - Game assets by [Kenney](https://kenney.nl/) (CC0)
+- “911 TURBO 930_Improved” by WolfGames36, based on the original model by
+  Lexyc16, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+  An archived experimental copy is retained for reference but is not loaded by
+  the game. See `docs/THIRD_PARTY_ASSETS.md`.
 - Base game: [mrdoob/Starter-Kit-Racing](https://github.com/mrdoob/Starter-Kit-Racing) (MIT)
 - Physics: [crashcat](https://github.com/isaac-mason/crashcat) · Rendering: [three.js](https://threejs.org)

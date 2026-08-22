@@ -1,0 +1,1767 @@
+{
+  "schemaVersion": 1,
+  "kind": "img2threejs.material-analysis",
+  "referenceId": "classic-911-style-coupe-multiview",
+  "manifest": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-regions.json",
+  "registry": "/private/tmp/img2threejs.Yr4879/repo/docs/materials/material-reference.json",
+  "targetThreshold": 0.7,
+  "notObservedMaterials": [
+    {
+      "materialSpecId": "black-trim",
+      "status": "proceed",
+      "reason": "Small black trim regions are consistently visible but too narrow for reliable independent PBR extraction; use the matte-plastic registry prior and controlled renders."
+    },
+    {
+      "materialSpecId": "lamp-lenses",
+      "status": "proceed",
+      "reason": "Headlamp, amber, and tail-lamp lens crops are dominated by stylized illumination; use transparent/emissive dielectric art direction and validate their geometry in unlit and neutral renders."
+    }
+  ],
+  "unresolvedNotObservedMaterials": [],
+  "regions": [
+    {
+      "componentId": "body-shell",
+      "regionId": "red-body-paint",
+      "materialSpecId": "body-paint",
+      "hypothesis": {
+        "componentId": "body-shell",
+        "regionId": "red-body-paint",
+        "materialId": null,
+        "family": "coating",
+        "subtype": "paint-over-metal",
+        "finish": "gloss-or-satin",
+        "aliases": [],
+        "confidence": 0.866,
+        "source": "four admitted concept views"
+      },
+      "assignment": {
+        "materialId": "coating.painted-metal",
+        "status": "proceed",
+        "source": "four admitted concept views",
+        "confidence": 0.866,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/00-red-body-paint.png",
+            "bbox": {
+              "x": 150,
+              "y": 285,
+              "width": 245,
+              "height": 128
+            },
+            "sourceWidth": 627,
+            "sourceHeight": 627,
+            "loaderWarnings": [],
+            "coverage": 0.0798
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.866,
+            "estimatedFidelity": 0.866,
+            "targetThreshold": 0.7,
+            "materialId": "body-paint",
+            "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/00-red-body-paint.png",
+            "outDir": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint",
+            "palette": [
+              "#DF312E",
+              "#E34746",
+              "#AC1917",
+              "#291715",
+              "#EAD7BC"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_albedo.png",
+                "url": "body-paint_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_roughness.png",
+                "url": "body-paint_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_height.png",
+                "url": "body-paint_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_normal.png",
+                "url": "body-paint_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_ao.png",
+                "url": "body-paint_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 245,
+              "sourceHeight": 128,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 245,
+                "height": 128
+              },
+              "mask": {
+                "backgroundColor": "#DE3230",
+                "backgroundNoise": 182.275,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.7994
+              },
+              "mapStats": {
+                "valueRange": 0.3092,
+                "heightP90Gradient": 0.1122,
+                "roughnessBase": 0.697,
+                "roughnessVariation": 0.173,
+                "normalStrength": 0.288,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#DF312E",
+                "#E34746",
+                "#AC1917",
+                "#291715",
+                "#EAD7BC"
+              ]
+            },
+            "warnings": [],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#DE5F5D",
+              "#D53734",
+              "#B53634",
+              "#B6766D",
+              "#A82F2D"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "horizontal",
+            "stats": {
+              "meanLum": 108.1,
+              "meanSaturation": 0.596,
+              "gradientStrength": 0.249,
+              "mottle": 0.029,
+              "streakRatio": 0.96,
+              "hueSpread": 0.016,
+              "specularFraction": 0.037
+            }
+          }
+        },
+        "profileId": "coating.painted-metal",
+        "family": "coating",
+        "subtype": "paint-over-metal",
+        "finish": "gloss-or-satin",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.45,
+          "clearcoat": 0.75,
+          "clearcoatRoughness": 0.12,
+          "ior": 1.5
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap"
+        ],
+        "optionalMaps": [
+          "normalMap",
+          "clearcoatMap",
+          "clearcoatRoughnessMap",
+          "metalnessMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "environment-reflection",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "gltf.2",
+          "khronos.gltf-pbr",
+          "adobe.pbr-guide-1",
+          "adobe.pbr-guide-2"
+        ],
+        "visualCues": [
+          "diffuse paint colour under a separate glossy coat",
+          "chips may expose metallic substrate"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/00-red-body-paint.png",
+        "bbox": {
+          "x": 150,
+          "y": 285,
+          "width": 245,
+          "height": 128
+        },
+        "sourceWidth": 627,
+        "sourceHeight": 627,
+        "loaderWarnings": [],
+        "coverage": 0.0798
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#DE5F5D",
+          "#D53734",
+          "#B53634",
+          "#B6766D",
+          "#A82F2D"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "horizontal",
+        "stats": {
+          "meanLum": 108.1,
+          "meanSaturation": 0.596,
+          "gradientStrength": 0.249,
+          "mottle": 0.029,
+          "streakRatio": 0.96,
+          "hueSpread": 0.016,
+          "specularFraction": 0.037
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.866,
+        "estimatedFidelity": 0.866,
+        "targetThreshold": 0.7,
+        "materialId": "body-paint",
+        "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/00-red-body-paint.png",
+        "outDir": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint",
+        "palette": [
+          "#DF312E",
+          "#E34746",
+          "#AC1917",
+          "#291715",
+          "#EAD7BC"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_albedo.png",
+            "url": "body-paint_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_roughness.png",
+            "url": "body-paint_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_height.png",
+            "url": "body-paint_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_normal.png",
+            "url": "body-paint_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_ao.png",
+            "url": "body-paint_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 245,
+          "sourceHeight": 128,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 245,
+            "height": 128
+          },
+          "mask": {
+            "backgroundColor": "#DE3230",
+            "backgroundNoise": 182.275,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.7994
+          },
+          "mapStats": {
+            "valueRange": 0.3092,
+            "heightP90Gradient": 0.1122,
+            "roughnessBase": 0.697,
+            "roughnessVariation": 0.173,
+            "normalStrength": 0.288,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#DF312E",
+            "#E34746",
+            "#AC1917",
+            "#291715",
+            "#EAD7BC"
+          ]
+        },
+        "warnings": [],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/00-red-body-paint.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.866,
+        "estimatedFidelity": 0.866,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_albedo.png",
+            "url": "body-paint_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_roughness.png",
+            "url": "body-paint_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_height.png",
+            "url": "body-paint_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_normal.png",
+            "url": "body-paint_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_ao.png",
+            "url": "body-paint_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 245,
+          "sourceHeight": 128,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 245,
+            "height": 128
+          },
+          "mask": {
+            "backgroundColor": "#DE3230",
+            "backgroundNoise": 182.275,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.7994
+          },
+          "mapStats": {
+            "valueRange": 0.3092,
+            "heightP90Gradient": 0.1122,
+            "roughnessBase": 0.697,
+            "roughnessVariation": 0.173,
+            "normalStrength": 0.288,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#DF312E",
+            "#E34746",
+            "#AC1917",
+            "#291715",
+            "#EAD7BC"
+          ]
+        },
+        "warnings": []
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_albedo.png",
+          "url": "body-paint_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_roughness.png",
+          "url": "body-paint_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_height.png",
+          "url": "body-paint_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_normal.png",
+          "url": "body-paint_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-00-red-body-paint/body-paint_ao.png",
+          "url": "body-paint_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "glazing",
+      "regionId": "smoked-window-glass",
+      "materialSpecId": "window-glass",
+      "hypothesis": {
+        "componentId": "glazing",
+        "regionId": "smoked-window-glass",
+        "materialId": null,
+        "family": "glass",
+        "subtype": "clear",
+        "finish": "polished",
+        "aliases": [],
+        "confidence": 0.82,
+        "source": "four admitted concept views"
+      },
+      "assignment": {
+        "materialId": "glass.clear",
+        "status": "proceed",
+        "source": "four admitted concept views",
+        "confidence": 0.82,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/01-smoked-window-glass.png",
+            "bbox": {
+              "x": 280,
+              "y": 185,
+              "width": 210,
+              "height": 132
+            },
+            "sourceWidth": 627,
+            "sourceHeight": 627,
+            "loaderWarnings": [],
+            "coverage": 0.0705
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.909,
+            "estimatedFidelity": 0.909,
+            "targetThreshold": 0.7,
+            "materialId": "window-glass",
+            "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/01-smoked-window-glass.png",
+            "outDir": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass",
+            "palette": [
+              "#EC4E4B",
+              "#DD2925",
+              "#231F1D",
+              "#9A1C19",
+              "#E97C79"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_albedo.png",
+                "url": "window-glass_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_roughness.png",
+                "url": "window-glass_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_height.png",
+                "url": "window-glass_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_normal.png",
+                "url": "window-glass_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_ao.png",
+                "url": "window-glass_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 210,
+              "sourceHeight": 132,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 24,
+                "width": 210,
+                "height": 108
+              },
+              "mask": {
+                "backgroundColor": "#DEDAD7",
+                "backgroundNoise": 289.354,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.2242
+              },
+              "mapStats": {
+                "valueRange": 0.5034,
+                "heightP90Gradient": 0.08087,
+                "roughnessBase": 0.68,
+                "roughnessVariation": 0.134,
+                "normalStrength": 0.251,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#EC4E4B",
+                "#DD2925",
+                "#231F1D",
+                "#9A1C19",
+                "#E97C79"
+              ]
+            },
+            "warnings": [],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#DEBFBA",
+              "#4D3736",
+              "#645959",
+              "#463C3C",
+              "#A12320"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 79.7,
+              "meanSaturation": 0.2,
+              "gradientStrength": 0.615,
+              "mottle": 0.033,
+              "streakRatio": 0.86,
+              "hueSpread": 0.064,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "glass.clear",
+        "family": "glass",
+        "subtype": "clear",
+        "finish": "polished",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.05,
+          "transmission": 1.0,
+          "ior": 1.5
+        },
+        "requiredMaps": [
+          "roughnessMap",
+          "thicknessMap"
+        ],
+        "optionalMaps": [
+          "map",
+          "normalMap",
+          "transmissionMap"
+        ],
+        "validationViews": [
+          "neutral-studio",
+          "environment-reflection",
+          "backlight-transmission",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.pmrem",
+          "gltf.2",
+          "khronos.transmission",
+          "khronos.volume",
+          "google.filament-pbr"
+        ],
+        "visualCues": [
+          "background distortion",
+          "bright interface reflection",
+          "visible thickness or absorption"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/01-smoked-window-glass.png",
+        "bbox": {
+          "x": 280,
+          "y": 185,
+          "width": 210,
+          "height": 132
+        },
+        "sourceWidth": 627,
+        "sourceHeight": 627,
+        "loaderWarnings": [],
+        "coverage": 0.0705
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#DEBFBA",
+          "#4D3736",
+          "#645959",
+          "#463C3C",
+          "#A12320"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 79.7,
+          "meanSaturation": 0.2,
+          "gradientStrength": 0.615,
+          "mottle": 0.033,
+          "streakRatio": 0.86,
+          "hueSpread": 0.064,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.909,
+        "estimatedFidelity": 0.909,
+        "targetThreshold": 0.7,
+        "materialId": "window-glass",
+        "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/01-smoked-window-glass.png",
+        "outDir": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass",
+        "palette": [
+          "#EC4E4B",
+          "#DD2925",
+          "#231F1D",
+          "#9A1C19",
+          "#E97C79"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_albedo.png",
+            "url": "window-glass_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_roughness.png",
+            "url": "window-glass_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_height.png",
+            "url": "window-glass_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_normal.png",
+            "url": "window-glass_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_ao.png",
+            "url": "window-glass_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 210,
+          "sourceHeight": 132,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 24,
+            "width": 210,
+            "height": 108
+          },
+          "mask": {
+            "backgroundColor": "#DEDAD7",
+            "backgroundNoise": 289.354,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.2242
+          },
+          "mapStats": {
+            "valueRange": 0.5034,
+            "heightP90Gradient": 0.08087,
+            "roughnessBase": 0.68,
+            "roughnessVariation": 0.134,
+            "normalStrength": 0.251,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#EC4E4B",
+            "#DD2925",
+            "#231F1D",
+            "#9A1C19",
+            "#E97C79"
+          ]
+        },
+        "warnings": [],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/01-smoked-window-glass.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.909,
+        "estimatedFidelity": 0.909,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_albedo.png",
+            "url": "window-glass_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_roughness.png",
+            "url": "window-glass_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_height.png",
+            "url": "window-glass_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_normal.png",
+            "url": "window-glass_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_ao.png",
+            "url": "window-glass_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 210,
+          "sourceHeight": 132,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 24,
+            "width": 210,
+            "height": 108
+          },
+          "mask": {
+            "backgroundColor": "#DEDAD7",
+            "backgroundNoise": 289.354,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.2242
+          },
+          "mapStats": {
+            "valueRange": 0.5034,
+            "heightP90Gradient": 0.08087,
+            "roughnessBase": 0.68,
+            "roughnessVariation": 0.134,
+            "normalStrength": 0.251,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#EC4E4B",
+            "#DD2925",
+            "#231F1D",
+            "#9A1C19",
+            "#E97C79"
+          ]
+        },
+        "warnings": []
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_albedo.png",
+          "url": "window-glass_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_roughness.png",
+          "url": "window-glass_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_height.png",
+          "url": "window-glass_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_normal.png",
+          "url": "window-glass_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-01-smoked-window-glass/window-glass_ao.png",
+          "url": "window-glass_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "wheels",
+      "regionId": "tire-rubber",
+      "materialSpecId": "tire-rubber",
+      "hypothesis": {
+        "componentId": "wheels",
+        "regionId": "tire-rubber",
+        "materialId": null,
+        "family": "rubber",
+        "subtype": "generic-elastomer",
+        "finish": "matte",
+        "aliases": [],
+        "confidence": 0.836,
+        "source": "admitted side view"
+      },
+      "assignment": {
+        "materialId": "rubber.matte",
+        "status": "proceed",
+        "source": "admitted side view",
+        "confidence": 0.836,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/02-tire-rubber.png",
+            "bbox": {
+              "x": 95,
+              "y": 326,
+              "width": 100,
+              "height": 102
+            },
+            "sourceWidth": 627,
+            "sourceHeight": 627,
+            "loaderWarnings": [],
+            "coverage": 0.0259
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.836,
+            "estimatedFidelity": 0.836,
+            "targetThreshold": 0.7,
+            "materialId": "tire-rubber",
+            "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/02-tire-rubber.png",
+            "outDir": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber",
+            "palette": [
+              "#080705",
+              "#040302",
+              "#13110E",
+              "#231815",
+              "#A91511"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_albedo.png",
+                "url": "tire-rubber_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_roughness.png",
+                "url": "tire-rubber_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_height.png",
+                "url": "tire-rubber_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_normal.png",
+                "url": "tire-rubber_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_ao.png",
+                "url": "tire-rubber_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 100,
+              "sourceHeight": 102,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 100,
+                "height": 99
+              },
+              "mask": {
+                "backgroundColor": "#D2CCC8",
+                "backgroundNoise": 281.777,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.1076
+              },
+              "mapStats": {
+                "valueRange": 0.1861,
+                "heightP90Gradient": 0.03547,
+                "roughnessBase": 0.68,
+                "roughnessVariation": 0.05,
+                "normalStrength": 0.198,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#080705",
+                "#040302",
+                "#13110E",
+                "#231815",
+                "#A91511"
+              ]
+            },
+            "warnings": [
+              "low value range weakens height/roughness inference"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "worn-composite",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.9,
+              "clearcoat": 0.0,
+              "clearcoatRoughness": 0.0,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 0.5,
+              "anisotropy": 0.0,
+              "procedural": "mottle"
+            },
+            "palette": [
+              "#5B322F",
+              "#32312E",
+              "#5D5B58",
+              "#73706D",
+              "#53524F"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "horizontal",
+            "stats": {
+              "meanLum": 81.5,
+              "meanSaturation": 0.106,
+              "gradientStrength": 0.289,
+              "mottle": 0.062,
+              "streakRatio": 0.94,
+              "hueSpread": 0.184,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "rubber.matte",
+        "family": "rubber",
+        "subtype": "generic-elastomer",
+        "finish": "matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.88,
+          "ior": 1.48
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "aoMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-standard",
+          "adobe.pbr-guide-1",
+          "google.filament-pbr",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "dark diffuse body",
+          "weak broad highlight",
+          "molded or grippy microtexture"
+        ]
+      },
+      "observations": [
+        "near-neutral colour response",
+        "visible meso/micro variation",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/02-tire-rubber.png",
+        "bbox": {
+          "x": 95,
+          "y": 326,
+          "width": 100,
+          "height": 102
+        },
+        "sourceWidth": 627,
+        "sourceHeight": 627,
+        "loaderWarnings": [],
+        "coverage": 0.0259
+      },
+      "textureAnalysis": {
+        "finishClass": "worn-composite",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.9,
+          "clearcoat": 0.0,
+          "clearcoatRoughness": 0.0,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 0.5,
+          "anisotropy": 0.0,
+          "procedural": "mottle"
+        },
+        "palette": [
+          "#5B322F",
+          "#32312E",
+          "#5D5B58",
+          "#73706D",
+          "#53524F"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "horizontal",
+        "stats": {
+          "meanLum": 81.5,
+          "meanSaturation": 0.106,
+          "gradientStrength": 0.289,
+          "mottle": 0.062,
+          "streakRatio": 0.94,
+          "hueSpread": 0.184,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.836,
+        "estimatedFidelity": 0.836,
+        "targetThreshold": 0.7,
+        "materialId": "tire-rubber",
+        "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/02-tire-rubber.png",
+        "outDir": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber",
+        "palette": [
+          "#080705",
+          "#040302",
+          "#13110E",
+          "#231815",
+          "#A91511"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_albedo.png",
+            "url": "tire-rubber_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_roughness.png",
+            "url": "tire-rubber_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_height.png",
+            "url": "tire-rubber_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_normal.png",
+            "url": "tire-rubber_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_ao.png",
+            "url": "tire-rubber_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 100,
+          "sourceHeight": 102,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 99
+          },
+          "mask": {
+            "backgroundColor": "#D2CCC8",
+            "backgroundNoise": 281.777,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.1076
+          },
+          "mapStats": {
+            "valueRange": 0.1861,
+            "heightP90Gradient": 0.03547,
+            "roughnessBase": 0.68,
+            "roughnessVariation": 0.05,
+            "normalStrength": 0.198,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#080705",
+            "#040302",
+            "#13110E",
+            "#231815",
+            "#A91511"
+          ]
+        },
+        "warnings": [
+          "low value range weakens height/roughness inference"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/02-tire-rubber.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.836,
+        "estimatedFidelity": 0.836,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_albedo.png",
+            "url": "tire-rubber_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_roughness.png",
+            "url": "tire-rubber_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_height.png",
+            "url": "tire-rubber_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_normal.png",
+            "url": "tire-rubber_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_ao.png",
+            "url": "tire-rubber_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 100,
+          "sourceHeight": 102,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 99
+          },
+          "mask": {
+            "backgroundColor": "#D2CCC8",
+            "backgroundNoise": 281.777,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.1076
+          },
+          "mapStats": {
+            "valueRange": 0.1861,
+            "heightP90Gradient": 0.03547,
+            "roughnessBase": 0.68,
+            "roughnessVariation": 0.05,
+            "normalStrength": 0.198,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#080705",
+            "#040302",
+            "#13110E",
+            "#231815",
+            "#A91511"
+          ]
+        },
+        "warnings": [
+          "low value range weakens height/roughness inference"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_albedo.png",
+          "url": "tire-rubber_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_roughness.png",
+          "url": "tire-rubber_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_height.png",
+          "url": "tire-rubber_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_normal.png",
+          "url": "tire-rubber_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-02-tire-rubber/tire-rubber_ao.png",
+          "url": "tire-rubber_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "wheels",
+      "regionId": "silver-wheel-metal",
+      "materialSpecId": "wheel-metal",
+      "hypothesis": {
+        "componentId": "wheels",
+        "regionId": "silver-wheel-metal",
+        "materialId": null,
+        "family": "metal",
+        "subtype": "aluminum",
+        "finish": "satin",
+        "aliases": [],
+        "confidence": 0.9,
+        "source": "admitted side view"
+      },
+      "assignment": {
+        "materialId": "metal.aluminum",
+        "status": "proceed",
+        "source": "admitted side view",
+        "confidence": 0.9,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/03-silver-wheel-metal.png",
+            "bbox": {
+              "x": 118,
+              "y": 349,
+              "width": 58,
+              "height": 58
+            },
+            "sourceWidth": 627,
+            "sourceHeight": 627,
+            "loaderWarnings": [],
+            "coverage": 0.0086
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.909,
+            "estimatedFidelity": 0.909,
+            "targetThreshold": 0.7,
+            "materialId": "wheel-metal",
+            "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/03-silver-wheel-metal.png",
+            "outDir": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal",
+            "palette": [
+              "#A29E9A",
+              "#918E8A",
+              "#B3B0AC",
+              "#13110F",
+              "#CFCDC9"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_albedo.png",
+                "url": "wheel-metal_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_roughness.png",
+                "url": "wheel-metal_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_height.png",
+                "url": "wheel-metal_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_normal.png",
+                "url": "wheel-metal_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_ao.png",
+                "url": "wheel-metal_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 58,
+              "sourceHeight": 58,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 3,
+                "y": 0,
+                "width": 55,
+                "height": 58
+              },
+              "mask": {
+                "backgroundColor": "#43413D",
+                "backgroundNoise": 50.892,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.4777
+              },
+              "mapStats": {
+                "valueRange": 0.7011,
+                "heightP90Gradient": 0.07735,
+                "roughnessBase": 0.699,
+                "roughnessVariation": 0.132,
+                "normalStrength": 0.247,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#A29E9A",
+                "#918E8A",
+                "#B3B0AC",
+                "#13110F",
+                "#CFCDC9"
+              ]
+            },
+            "warnings": [],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "worn-composite",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.9,
+              "clearcoat": 0.0,
+              "clearcoatRoughness": 0.0,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 0.5,
+              "anisotropy": 0.0,
+              "procedural": "mottle"
+            },
+            "palette": [
+              "#8C8A88",
+              "#85837F",
+              "#72706D",
+              "#3F3E3B",
+              "#363533"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 106.0,
+              "meanSaturation": 0.073,
+              "gradientStrength": 0.392,
+              "mottle": 0.053,
+              "streakRatio": 0.93,
+              "hueSpread": 0.154,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "metal.aluminum",
+        "family": "metal",
+        "subtype": "aluminum",
+        "finish": "satin",
+        "renderPrior": {
+          "metalness": 1.0,
+          "roughness": 0.3,
+          "anisotropy": 0.2
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap"
+        ],
+        "optionalMaps": [
+          "normalMap",
+          "anisotropyMap"
+        ],
+        "validationViews": [
+          "neutral-studio",
+          "environment-reflection",
+          "grazing"
+        ],
+        "sourceRefs": [
+          "three.mesh-standard",
+          "three.pmrem",
+          "gltf.2",
+          "khronos.gltf-pbr",
+          "adobe.pbr-guide-2",
+          "google.filament-pbr"
+        ],
+        "visualCues": [
+          "bright neutral conductor",
+          "soft satin highlight unless polished",
+          "often fine machining direction"
+        ]
+      },
+      "observations": [
+        "near-neutral colour response",
+        "visible meso/micro variation",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/03-silver-wheel-metal.png",
+        "bbox": {
+          "x": 118,
+          "y": 349,
+          "width": 58,
+          "height": 58
+        },
+        "sourceWidth": 627,
+        "sourceHeight": 627,
+        "loaderWarnings": [],
+        "coverage": 0.0086
+      },
+      "textureAnalysis": {
+        "finishClass": "worn-composite",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.9,
+          "clearcoat": 0.0,
+          "clearcoatRoughness": 0.0,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 0.5,
+          "anisotropy": 0.0,
+          "procedural": "mottle"
+        },
+        "palette": [
+          "#8C8A88",
+          "#85837F",
+          "#72706D",
+          "#3F3E3B",
+          "#363533"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 106.0,
+          "meanSaturation": 0.073,
+          "gradientStrength": 0.392,
+          "mottle": 0.053,
+          "streakRatio": 0.93,
+          "hueSpread": 0.154,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.909,
+        "estimatedFidelity": 0.909,
+        "targetThreshold": 0.7,
+        "materialId": "wheel-metal",
+        "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/03-silver-wheel-metal.png",
+        "outDir": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal",
+        "palette": [
+          "#A29E9A",
+          "#918E8A",
+          "#B3B0AC",
+          "#13110F",
+          "#CFCDC9"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_albedo.png",
+            "url": "wheel-metal_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_roughness.png",
+            "url": "wheel-metal_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_height.png",
+            "url": "wheel-metal_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_normal.png",
+            "url": "wheel-metal_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_ao.png",
+            "url": "wheel-metal_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 58,
+          "sourceHeight": 58,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 3,
+            "y": 0,
+            "width": 55,
+            "height": 58
+          },
+          "mask": {
+            "backgroundColor": "#43413D",
+            "backgroundNoise": 50.892,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.4777
+          },
+          "mapStats": {
+            "valueRange": 0.7011,
+            "heightP90Gradient": 0.07735,
+            "roughnessBase": 0.699,
+            "roughnessVariation": 0.132,
+            "normalStrength": 0.247,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#A29E9A",
+            "#918E8A",
+            "#B3B0AC",
+            "#13110F",
+            "#CFCDC9"
+          ]
+        },
+        "warnings": [],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/03-silver-wheel-metal.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.909,
+        "estimatedFidelity": 0.909,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_albedo.png",
+            "url": "wheel-metal_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_roughness.png",
+            "url": "wheel-metal_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_height.png",
+            "url": "wheel-metal_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_normal.png",
+            "url": "wheel-metal_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_ao.png",
+            "url": "wheel-metal_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 58,
+          "sourceHeight": 58,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 3,
+            "y": 0,
+            "width": 55,
+            "height": 58
+          },
+          "mask": {
+            "backgroundColor": "#43413D",
+            "backgroundNoise": 50.892,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.4777
+          },
+          "mapStats": {
+            "valueRange": 0.7011,
+            "heightP90Gradient": 0.07735,
+            "roughnessBase": 0.699,
+            "roughnessVariation": 0.132,
+            "normalStrength": 0.247,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#A29E9A",
+            "#918E8A",
+            "#B3B0AC",
+            "#13110F",
+            "#CFCDC9"
+          ]
+        },
+        "warnings": []
+      },
+      "maps": {
+        "albedo": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_albedo.png",
+          "url": "wheel-metal_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_roughness.png",
+          "url": "wheel-metal_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_height.png",
+          "url": "wheel-metal_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_normal.png",
+          "url": "wheel-metal_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-evidence/pbr-03-silver-wheel-metal/wheel-metal_ao.png",
+          "url": "wheel-metal_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    }
+  ],
+  "status": "proceed",
+  "limitations": [
+    "PBR extraction is reference-derived inference, not inverse rendering.",
+    "A crop must be checked against the component visible footprint before accepting material scores."
+  ],
+  "artifact": "/Users/ugshanyu/usion-racing/docs/img2threejs/classic-911/material-analysis.json"
+}

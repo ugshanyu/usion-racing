@@ -31,6 +31,19 @@ const css = `
 	.btn.secondary { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.18); }
 	.btn.ready-on { background: #5af168; }
 	.btn:disabled { opacity: 0.35; cursor: default; }
+	.race-settings { width: 100%; max-width: 340px; display: flex; align-items: center; justify-content: space-between;
+		gap: 14px; margin: -8px 0 18px; }
+	.race-settings .setting-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+		opacity: 0.65; white-space: nowrap; }
+	.lap-options { display: grid; grid-template-columns: repeat(3, minmax(48px, 1fr)); gap: 6px; flex: 1; max-width: 206px; }
+	.lap-option { min-height: 44px; border: 1px solid rgba(255,255,255,0.16); border-radius: 11px;
+		background: rgba(255,255,255,0.08); color: #fff; font: 700 14px inherit; cursor: pointer; }
+	.lap-option.selected { background: #fff; border-color: #fff; color: #0b0d10; }
+	.lap-option:disabled { opacity: 0.72; cursor: default; }
+	@media (max-width: 390px) {
+		.race-settings { align-items: stretch; flex-direction: column; gap: 8px; }
+		.lap-options { max-width: none; width: 100%; }
+	}
 	.hint { font-size: 13px; opacity: 0.6; margin-top: 14px; text-align: center; }
 	#hud { position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 12px; right: 12px;
 		display: none; justify-content: space-between; align-items: flex-start; pointer-events: none; }
@@ -120,6 +133,20 @@ export class UI {
 		this.el( 'h1', null, this.hall, t( 'waitingRoom' ) );
 		this.el( 'p', 'sub', this.hall, t( 'waitingSub' ) );
 		this.rosterEl = this.el( 'div', 'roster', this.hall );
+		this.raceSettings = this.el( 'div', 'race-settings', this.hall );
+		this.el( 'div', 'setting-label', this.raceSettings, t( 'raceLength' ) );
+		this.lapOptions = this.el( 'div', 'lap-options', this.raceSettings );
+		this.lapButtons = new Map();
+
+		for ( const laps of [ 3, 5, 10 ] ) {
+
+			const button = this.el( 'button', 'lap-option', this.lapOptions, `${ laps } ${ t( 'laps' ) }` );
+			button.type = 'button';
+			button.setAttribute( 'aria-label', `${ t( 'raceLength' ) }: ${ laps } ${ t( 'laps' ) }` );
+			button.addEventListener( 'click', () => { if ( this.onLapChange ) this.onLapChange( laps ); } );
+			this.lapButtons.set( laps, button );
+
+		}
 		this.readyBtn = this.el( 'button', 'btn', this.hall, t( 'notReady' ) );
 		this.startBtn = this.el( 'button', 'btn', this.hall, t( 'startRace' ) );
 		this.inviteBtn = this.el( 'button', 'btn secondary', this.hall, t( 'invite' ) );
@@ -226,7 +253,7 @@ export class UI {
 
 	}
 
-	updateHall( roster, myId, isHost, minPlayers ) {
+	updateHall( roster, myId, isHost, minPlayers, laps = 3 ) {
 
 		this.rosterEl.textContent = '';
 
@@ -269,10 +296,24 @@ export class UI {
 
 		this.startBtn.style.display = isHost ? '' : 'none';
 		this.startBtn.disabled = roster.length < minPlayers || ! allReady;
+		this.updateLapChoice( laps, isHost );
 
 		this.hallHint.textContent = isHost
 			? ( roster.length < minPlayers ? t( 'needPlayers' ) : '' )
 			: t( 'waitingHost' );
+
+	}
+
+	updateLapChoice( laps, isHost ) {
+
+		for ( const [ value, button ] of this.lapButtons ) {
+
+			const selected = value === laps;
+			button.className = selected ? 'lap-option selected' : 'lap-option';
+			button.disabled = ! isHost;
+			button.setAttribute( 'aria-pressed', selected ? 'true' : 'false' );
+
+		}
 
 	}
 

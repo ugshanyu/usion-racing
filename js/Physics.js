@@ -120,6 +120,60 @@ export function buildWallColliders( world, debugGroup, customCells ) {
 
 }
 
+export function buildCurvedWallColliders( world, path, debugGroup ) {
+
+	const step = 2;
+	const wallOffset = path.roadHalfWidth + 0.72;
+	const wallHalfThickness = 0.2;
+	const wallHalfHeight = 0.8;
+	const wallY = 0.72;
+	const count = path.points.length;
+
+	for ( let i = 0; i < count; i += step ) {
+
+		const a = path.points[ i ];
+		const b = path.points[ ( i + step ) % count ];
+		const dx = b.x - a.x;
+		const dz = b.z - a.z;
+		const length = Math.hypot( dx, dz );
+		if ( length < 0.001 ) continue;
+
+		const tangentX = dx / length;
+		const tangentZ = dz / length;
+		const normalX = tangentZ;
+		const normalZ = - tangentX;
+		const angle = Math.atan2( tangentX, tangentZ );
+		const quaternion = [ 0, Math.sin( angle / 2 ), 0, Math.cos( angle / 2 ) ];
+		const halfExtents = [ wallHalfThickness, wallHalfHeight, length / 2 + 0.12 ];
+		const centerX = ( a.x + b.x ) / 2;
+		const centerZ = ( a.z + b.z ) / 2;
+
+		for ( const side of [ - 1, 1 ] ) {
+
+			const position = [
+				centerX + normalX * wallOffset * side,
+				wallY,
+				centerZ + normalZ * wallOffset * side,
+			];
+
+			rigidBody.create( world, {
+				shape: box.create( { halfExtents } ),
+				motionType: MotionType.STATIC,
+				objectLayer: world._OL_STATIC,
+				position,
+				quaternion,
+				friction: 0.0,
+				restitution: 0.1,
+			} );
+
+			if ( debugGroup ) addDebugBox( debugGroup, halfExtents, position, quaternion );
+
+		}
+
+	}
+
+}
+
 export function createSphereBody( world, spawnPos ) {
 
 	const body = rigidBody.create( world, {

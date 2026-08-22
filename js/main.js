@@ -5,7 +5,7 @@ import { createWorldSettings, createWorld, addBroadphaseLayer, addObjectLayer, e
 import { Vehicle, MAX_SPEED } from './Vehicle.js';
 import { Camera } from './Camera.js';
 import { Controls } from './Controls.js';
-import { buildTrack, computeSpawnPosition, computeTrackBounds, TRACK_CELLS } from './Track.js';
+import { buildTrack, computeTrackBounds, TRACK_CELLS } from './Track.js';
 import { buildWallColliders, createSphereBody } from './Physics.js';
 import { SmokeTrails } from './Particles.js';
 import { DriftMarks } from './DriftMarks.js';
@@ -15,14 +15,14 @@ import { ColorMapGLTFLoader } from './Loader.js';
 import { TrackPath } from './TrackPath.js';
 import { RemoteCar } from './RemoteCar.js';
 import { Bot, BOT_NAMES, BOT_SPEEDS } from './Bots.js';
-import { Net, actionSafe } from './net.js';
+import { Net } from './net.js';
 import { UI } from './ui.js';
 import { setLanguage, t } from './i18n.js';
 
-const LAPS = 3;
+const DEFAULT_LAPS = 3;
 const MAX_PLAYERS = 4;
 const CAR_COLORS = [ 'vehicle-truck-yellow', 'vehicle-truck-green', 'vehicle-truck-purple', 'vehicle-truck-red' ];
-const BROADCAST_MS = 66;          // ~15 Hz (first-version cadence)
+const BROADCAST_MS = 1000 / 60;   // one freshest owner transform per display frame
 const RACE_OVER_TIMEOUT = 60;     // seconds after the first finisher
 
 // ---------- Usion bootstrap (with a graceful local-dev stub) ----------
@@ -30,10 +30,30 @@ const RACE_OVER_TIMEOUT = 60;     // seconds after the first finisher
 if ( ! window.Usion ) {
 
 	const noop = () => {};
+	const query = new URLSearchParams( window.location.search );
+	const localMultiplayer = query.get( 'multiplayer' ) === '1';
 	window.Usion = {
-		init: ( cb ) => cb( { userId: 'dev', userName: 'Dev', playerIds: [], language: 'en', theme: 'dark' } ),
-		getLaunchParams: () => ( { mode: 'single' } ),
-		user: { getId: () => 'dev' },
+		init: ( cb ) => cb( {
+			userId: query.get( 'player' ) || 'dev',
+			userName: query.get( 'player' ) || 'Dev',
+			userAvatar: query.get( 'avatar' ) || null,
+			playerIds: [],
+			roomId: localMultiplayer ? query.get( 'room' ) || 'local-room' : null,
+			mode: localMultiplayer ? 'multiplayer' : 'single',
+			language: 'en',
+			theme: 'dark',
+		} ),
+		getLaunchParams: () => ( { mode: localMultiplayer ? 'multiplayer' : 'single', roomId: localMultiplayer ? query.get( 'room' ) || 'local-room' : null } ),
+		user: {
+			getId: () => query.get( 'player' ) || 'dev',
+			getName: () => query.get( 'player' ) || 'Dev',
+			getAvatar: () => query.get( 'avatar' ) || null,
+			getProfile: async () => ( {
+				id: query.get( 'player' ) || 'dev',
+				name: query.get( 'player' ) || 'Dev',
+				avatar: query.get( 'avatar' ) || null,
+			} ),
+		},
 		game: new Proxy( {}, { get: () => noop } ),
 		leaderboard: { submit: async () => ( {} ), friends: async () => [], top: async () => [] },
 	};
@@ -44,6 +64,7 @@ function launchedSolo( config ) {
 
 	try {
 
+		if ( new URLSearchParams( window.location.search ).get( 'multiplayer' ) === '1' ) return false;
 		const lp = ( window.Usion && Usion.getLaunchParams && Usion.getLaunchParams() ) || {};
 		if ( lp.mode === 'single' ) return true;
 		if ( lp.mode === 'multiplayer' ) return false;
@@ -76,8 +97,12 @@ const G = {
 	resultReported: false,
 	broadcastTimer: null,
 	placements: null,
+	laps: DEFAULT_LAPS,
 	nameCache: new Map(),
 	lastHeartbeat: 0,
+	snapSeq: 0,
+	lastSnapHeading: null,
+	lastSnapAt: 0,
 };
 
 let renderer, scene, dirLight, cam, controls, particles, driftMarks, audio, audioRig, lapTimer, path, ui, net, models, world, contactListener;
@@ -87,6 +112,30 @@ const _camLead = new THREE.Vector3();
 const _proj = new THREE.Vector3();
 
 // ---------- Boot ----------
+
+function setLoadingStatus( message ) {
+
+	const status = document.getElementById( 'loading-status' );
+	if ( status ) status.textContent = message;
+
+}
+
+function finishLoading() {
+
+	const screen = document.getElementById( 'loading-screen' );
+	if ( ! screen ) return;
+	setLoadingStatus( 'Race ready' );
+	requestAnimationFrame( () => requestAnimationFrame( () => screen.classList.add( 'is-ready' ) ) );
+
+}
+
+function showLoadingError( error ) {
+
+	const screen = document.getElementById( 'loading-screen' );
+	if ( screen ) screen.classList.add( 'is-error' );
+	setLoadingStatus( `Startup failed · ${ error && error.message ? error.message : 'Please reload' }` );
+
+}
 
 function whenViewportReady( cb ) {
 
@@ -103,7 +152,14 @@ function boot( config ) {
 	booted = true;
 	G.config = config;
 	setLanguage( config.language );
-	whenViewportReady( () => init( config ).catch( ( e ) => console.error( 'boot failed', e ) ) );
+	whenViewportReady( () => init( config ).catch( ( error ) => {
+
+		console.error( 'boot failed', error );
+		showLoadingError( error );
+		const uiRoot = document.getElementById( 'ui' );
+		if ( uiRoot ) uiRoot.textContent = `Game failed to start: ${ error && error.message ? error.message : 'unknown error' }`;
+
+	} ) );
 
 }
 
@@ -123,10 +179,15 @@ if ( ! embedded ) {
 
 	setTimeout( () => {
 
+		const query = new URLSearchParams( window.location.search );
+		const localMultiplayer = query.get( 'multiplayer' ) === '1';
 		boot( {
-			userId: 'guest_local',
-			userName: 'Player',
+			userId: query.get( 'player' ) || 'guest_local',
+			userName: query.get( 'player' ) || 'Player',
+			userAvatar: query.get( 'avatar' ) || null,
 			playerIds: [],
+			roomId: localMultiplayer ? query.get( 'room' ) || 'local-room' : null,
+			mode: localMultiplayer ? 'multiplayer' : 'single',
 			language: ( navigator.language || 'en' ).slice( 0, 2 ),
 			theme: 'dark',
 		} );
@@ -137,6 +198,7 @@ if ( ! embedded ) {
 
 async function init( config ) {
 
+	setLoadingStatus( 'Starting engines' );
 	renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setPixelRatio( Math.min( window.devicePixelRatio, 2 ) );
@@ -182,7 +244,9 @@ async function init( config ) {
 	} ).observe( document.body );
 
 	registerAll();
+	setLoadingStatus( 'Loading trucks and track' );
 	models = await loadModels();
+	setLoadingStatus( 'Building the original grid' );
 
 	const cells = TRACK_CELLS;
 	const bounds = computeTrackBounds( cells );
@@ -262,20 +326,22 @@ async function init( config ) {
 	};
 
 	lapTimer = new LapTimer( cells, {
-		laps: LAPS,
+		laps: DEFAULT_LAPS,
 		onLap: () => {},
 		onRaceEnd: ( total ) => onMyRaceEnd( total ),
 	} );
 
 	ui = new UI();
 	ui.onChatSend = ( v ) => { if ( net.sendChat( v ) ) ui.showBubble( G.config.userId, v ); };
+	ui.onLapChange = ( laps ) => net.setLaps( laps );
 	ui.readyBtn.addEventListener( 'click', () => net.setReady( ! net.me().ready ) );
-	ui.startBtn.addEventListener( 'click', () => net.startRace( LAPS ) );
+	ui.startBtn.addEventListener( 'click', () => net.startRace( net.laps ) );
 	ui.inviteBtn.addEventListener( 'click', () => net.invite() );
 	ui.botsBtn.addEventListener( 'click', () => startSoloRace() );
 	ui.againBtn.addEventListener( 'click', () => onRaceAgain() );
 
 	net = new Net();
+	setLoadingStatus( 'Connecting race control' );
 	net.setup( config, {
 		onRoster: ( roster ) => onRoster( roster ),
 		onPromoted: () => onPromoted(),
@@ -296,6 +362,8 @@ async function init( config ) {
 		onPlayerGone: ( id ) => onPlayerGone( id ),
 		onRaceOver: ( placements ) => applyRaceOver( placements ),
 		onConnState: ( s ) => onConnState( s ),
+		onPhase: ( state ) => onAuthoritativePhase( state ),
+		onSettings: ( settings ) => onRaceSettings( settings ),
 	} );
 
 	if ( ! launchedSolo( config ) && config.roomId ) {
@@ -312,6 +380,7 @@ async function init( config ) {
 	window.__racing = { G, get controls() { return controls; }, get net() { return net; } };
 
 	animate();
+	finishLoading();
 
 }
 
@@ -416,6 +485,8 @@ function clearRemotes() {
 function startSoloRace() {
 
 	G.mode = 'solo';
+	G.laps = DEFAULT_LAPS;
+	lapTimer.totalLaps = G.laps;
 	stopBroadcast();
 	clearRemotes();
 	ui.showHall( false );
@@ -477,14 +548,21 @@ function onRoster( roster ) {
 
 	for ( const p of roster ) G.nameCache.set( p.id, { name: p.name, isBot: false } );
 
-	if ( G.state === 'hall' ) ui.updateHall( roster, G.config.userId, net.isHost(), 2 );
+	if ( G.state === 'hall' ) ui.updateHall( roster, G.config.userId, net.isHost(), 2, net.laps );
 
 	const humans = roster.length;
 	ui.showChatButton( G.mode === 'mp' && humans >= 2 && ( G.state === 'hall' || G.state === 'racing' || G.state === 'countdown' || G.state === 'results' ) );
 
 }
 
-function onKickoff( { seats } ) {
+function onRaceSettings( { laps } ) {
+
+	G.laps = laps;
+	if ( G.state === 'hall' ) ui.updateLapChoice( laps, net.isHost() );
+
+}
+
+function onKickoff( { seats, laps, phase, countdownMs, elapsedMs } ) {
 
 	if ( ! seats.includes( G.config.userId ) ) {
 
@@ -496,6 +574,8 @@ function onKickoff( { seats } ) {
 	}
 
 	G.mode = 'mp';
+	G.laps = [ 3, 5, 10 ].includes( Number( laps ) ) ? Number( laps ) : DEFAULT_LAPS;
+	lapTimer.totalLaps = G.laps;
 	G.seats = seats.slice( 0, MAX_PLAYERS );
 	G.mySeat = G.seats.indexOf( G.config.userId );
 
@@ -520,8 +600,27 @@ function onKickoff( { seats } ) {
 
 	} );
 
-	beginCountdown();
+	beginCountdown( typeof countdownMs === 'number' ? countdownMs : 3600 );
 	startBroadcast();
+
+	if ( phase === 'racing' ) raceGo( elapsedMs || 0 );
+
+}
+
+function onAuthoritativePhase( { phase, countdownMs, elapsedMs, match } ) {
+
+	if ( match !== net.appliedKickoffSeq || G.mode !== 'mp' ) return;
+
+	if ( phase === 'countdown' && G.state === 'countdown' ) {
+
+		G.countdownEnd = performance.now() + Math.max( 0, countdownMs );
+
+	} else if ( phase === 'racing' ) {
+
+		if ( G.state === 'countdown' ) raceGo( elapsedMs || 0 );
+		else if ( G.state === 'racing' ) G.raceClock = Math.max( G.raceClock, ( elapsedMs || 0 ) / 1000 );
+
+	}
 
 }
 
@@ -530,8 +629,22 @@ function buildCarSnap() {
 	_forward.set( 0, 0, 1 ).applyQuaternion( G.vehicle.container.quaternion );
 	const h = Math.atan2( _forward.x, _forward.z );
 	const p = G.vehicle.spherePos;
-	const mv = G.vehicle.modelVelocity;
+	const mv = G.vehicle.sphereVel;
 	const rd = path.raceDistance( p, lapTimer.lap - 1 );
+	const snapAt = performance.now();
+	let angularVelocity = 0;
+
+	if ( G.lastSnapHeading !== null && snapAt > G.lastSnapAt ) {
+
+		let delta = h - G.lastSnapHeading;
+		while ( delta > Math.PI ) delta -= Math.PI * 2;
+		while ( delta < - Math.PI ) delta += Math.PI * 2;
+		angularVelocity = THREE.MathUtils.clamp( delta / ( ( snapAt - G.lastSnapAt ) / 1000 ), - 20, 20 );
+
+	}
+
+	G.lastSnapHeading = h;
+	G.lastSnapAt = snapAt;
 
 	return {
 		x: Math.round( p.x * 100 ) / 100,
@@ -539,9 +652,13 @@ function buildCarSnap() {
 		z: Math.round( p.z * 100 ) / 100,
 		h: Math.round( h * 1000 ) / 1000,
 		vx: Math.round( mv.x * 100 ) / 100,
+		vy: Math.round( mv.y * 100 ) / 100,
 		vz: Math.round( mv.z * 100 ) / 100,
+		av: Math.round( angularVelocity * 1000 ) / 1000,
 		l: lapTimer.lap,
 		rd: Math.round( rd * 10 ) / 10,
+		m: net.appliedKickoffSeq,
+		q: ++ G.snapSeq,
 	};
 
 }
@@ -549,6 +666,8 @@ function buildCarSnap() {
 function startBroadcast() {
 
 	stopBroadcast();
+	G.lastSnapHeading = null;
+	G.lastSnapAt = 0;
 	G.broadcastTimer = setInterval( () => {
 
 		if ( ! G.vehicle || G.mode !== 'mp' ) return;
@@ -559,8 +678,8 @@ function startBroadcast() {
 }
 
 // Dev-only netcode harness (?ghost=1, standalone solo): a ghost RemoteCar fed
-// by our own snapshots through simulated latency/jitter/loss, so interpolation
-// quality is observable without a second player.
+// by our own snapshots through simulated latency/jitter/loss, so prediction and
+// correction quality are observable without a second player.
 const GHOST_MODE = new URLSearchParams( window.location.search ).has( 'ghost' );
 
 function startGhost() {
@@ -595,7 +714,7 @@ function stopBroadcast() {
 
 // ---------- Race lifecycle (shared) ----------
 
-function beginCountdown() {
+function beginCountdown( countdownMs = 3600 ) {
 
 	G.state = 'countdown';
 	G.raceClock = 0;
@@ -611,7 +730,7 @@ function beginCountdown() {
 	controls.setTouchVisible( true );
 	ui.showHUD( true );
 	ui.updateHUD( lapTimer, 1, currentRacerCount() );
-	G.countdownEnd = performance.now() + 3600;
+	G.countdownEnd = performance.now() + countdownMs;
 
 }
 
@@ -621,9 +740,11 @@ function currentRacerCount() {
 
 }
 
-function raceGo() {
+function raceGo( elapsedMs = 0 ) {
 
+	if ( G.state === 'racing' ) return;
 	G.state = 'racing';
+	G.raceClock = Math.max( G.raceClock, elapsedMs / 1000 );
 	startGhost();
 	controls.enabled = true;
 	lapTimer.start();
@@ -653,7 +774,7 @@ function onMyRaceEnd( total ) {
 
 }
 
-// The record is the FINISHED race time (3 laps, seconds, lower wins). Only a
+// The record is the FINISHED race time (host-selected lap count, seconds, lower wins). Only a
 // completed race submits — a DNF has no time.
 function submitRaceTime( total ) {
 
@@ -736,7 +857,7 @@ function applyRaceOver( placements ) {
 	stopBroadcast();
 	showResults( placements, net.isHost() );
 
-	if ( net.isHost() && ! G.resultReported && placements.length >= 2 ) {
+	if ( net.isHost() && ! net.isAuthoritative() && ! G.resultReported && placements.length >= 2 ) {
 
 		G.resultReported = true;
 
@@ -804,13 +925,7 @@ function onRaceAgain() {
 
 	} else if ( net.isHost() ) {
 
-		// Rematch: everyone present in the room gets a seat (capped at 4).
-		const seats = net.playerIds.filter( ( id ) => net.present.has( id ) ).slice( 0, MAX_PLAYERS );
-
-		if ( seats.length < 2 ) { enterHall(); return; }
-
-		const seed = ( Math.random() * 0x7fffffff ) | 0;
-		actionSafe( 'kickoff', { seats, seed, laps: LAPS } );
+		if ( ! net.startRematch( net.laps ) ) enterHall();
 
 	}
 
@@ -912,7 +1027,7 @@ function animate() {
 
 	if ( G.lastHeartbeat && now - G.lastHeartbeat > 3000 && G.mode === 'mp' ) {
 
-		try { if ( Usion.game.requestSync ) Usion.game.requestSync(); } catch {}
+		net.requestSync();
 		net.broadcastInfo();
 
 	}
@@ -924,7 +1039,16 @@ function animate() {
 
 		const remain = G.countdownEnd - now;
 
-		if ( remain <= 0 ) raceGo();
+		if ( remain <= 0 ) {
+
+			// The countdown snapshots already carry the server-owned remaining
+			// duration. Do not freeze at "1" while waiting for one particular
+			// racing-phase packet: a delayed/dropped transition would otherwise
+			// strand every client even though the authoritative deadline passed.
+			if ( net.isAuthoritative() ) net.requestSync();
+			raceGo();
+
+		}
 		else ui.showCountdown( String( Math.ceil( remain / 1200 ) ) );
 
 	}
@@ -977,7 +1101,7 @@ function animate() {
 
 	}
 
-	for ( const b of G.bots ) b.update( dt, LAPS, G.raceClock );
+	for ( const b of G.bots ) b.update( dt, lapTimer.totalLaps, G.raceClock );
 	for ( const r of G.remotes.values() ) r.update( dt );
 
 	// HUD position + name labels
