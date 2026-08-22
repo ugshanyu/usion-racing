@@ -4,11 +4,18 @@
 
 const MAX_CHAT_LENGTH = 60;
 const LAP_OPTIONS = [ 3, 5, 10 ];
+const TRACK_OPTIONS = [ 'og', 'monaco' ];
 
 function raceLaps( value, fallback = 3 ) {
 
 	const laps = Number( value );
 	return LAP_OPTIONS.includes( laps ) ? laps : fallback;
+
+}
+
+function raceTrack( value, fallback = 'og' ) {
+
+	return typeof value === 'string' && TRACK_OPTIONS.includes( value ) ? value : fallback;
 
 }
 
@@ -81,6 +88,7 @@ export class Net {
 		this.authoritative = false;
 		this.serverPhase = 'waiting';
 		this.laps = 3;
+		this.track = 'og';
 
 		this.lastChatAt = 0;
 		this.lastChatSeq = 0;
@@ -365,9 +373,11 @@ export class Net {
 		if ( message.action_type === 'race_settings' ) {
 
 			const laps = raceLaps( data.laps, this.laps );
-			if ( laps === this.laps ) return;
+			const track = raceTrack( data.track, this.track );
+			if ( laps === this.laps && track === this.track ) return;
 			this.laps = laps;
-			if ( this.hooks.onSettings ) this.hooks.onSettings( { laps } );
+			this.track = track;
+			if ( this.hooks.onSettings ) this.hooks.onSettings( { laps, track } );
 
 		} else if ( message.action_type === 'kickoff' ) {
 
@@ -376,7 +386,8 @@ export class Net {
 			this.finishOrder = [];
 			this.finishTimes = {};
 			this.laps = raceLaps( data.laps, this.laps );
-			if ( this.hooks.onKickoff ) this.hooks.onKickoff( { seats: data.seats, seed: data.seed || 1, laps: this.laps, seq: sequence } );
+			this.track = raceTrack( data.track, this.track );
+			if ( this.hooks.onKickoff ) this.hooks.onKickoff( { seats: data.seats, seed: data.seed || 1, laps: this.laps, track: this.track, seq: sequence } );
 
 		} else if ( message.action_type === 'finished' ) {
 
@@ -468,10 +479,12 @@ export class Net {
 		if ( Array.isArray( snapshot.roster ) ) this.applyDirectRoster( snapshot.roster, snapshot.host_id );
 
 		const laps = raceLaps( snapshot.laps, this.laps );
-		if ( laps !== this.laps ) {
+		const track = raceTrack( snapshot.track, this.track );
+		if ( laps !== this.laps || track !== this.track ) {
 
 			this.laps = laps;
-			if ( this.hooks.onSettings ) this.hooks.onSettings( { laps } );
+			this.track = track;
+			if ( this.hooks.onSettings ) this.hooks.onSettings( { laps, track } );
 
 		}
 
@@ -488,6 +501,7 @@ export class Net {
 				seats,
 				seed: match,
 				laps: this.laps,
+				track: this.track,
 				seq: match,
 				phase: snapshot.phase,
 				countdownMs: Number( snapshot.countdown_ms ) || 0,
@@ -726,16 +740,30 @@ export class Net {
 		const laps = raceLaps( value, this.laps );
 		if ( laps === this.laps ) return true;
 		this.laps = laps;
-		if ( this.hooks.onSettings ) this.hooks.onSettings( { laps } );
-		this.sendAction( 'race_settings', { laps } );
+		if ( this.hooks.onSettings ) this.hooks.onSettings( { laps, track: this.track } );
+		this.sendAction( 'race_settings', { laps, track: this.track } );
 		return true;
 
 	}
 
-	startRace( laps ) {
+	setTrack( value ) {
+
+		if ( ! this.isHost() ) return false;
+		const track = raceTrack( value, this.track );
+		if ( track === this.track ) return true;
+		this.track = track;
+		if ( this.hooks.onSettings ) this.hooks.onSettings( { laps: this.laps, track } );
+		this.sendAction( 'race_settings', { laps: this.laps, track } );
+		return true;
+
+	}
+
+	startRace( laps, track = this.track ) {
 
 		laps = raceLaps( laps, this.laps );
+		track = raceTrack( track, this.track );
 		this.laps = laps;
+		this.track = track;
 
 		const seats = this.playerIds.filter( ( id ) => {
 
@@ -746,7 +774,7 @@ export class Net {
 		} );
 
 		if ( seats.length < 2 ) return false;
-		this.sendAction( 'kickoff', { seats: seats.slice( 0, 4 ), seed: ( Math.random() * 0x7fffffff ) | 0, laps } );
+		this.sendAction( 'kickoff', { seats: seats.slice( 0, 4 ), seed: ( Math.random() * 0x7fffffff ) | 0, laps, track } );
 		return true;
 
 	}
@@ -767,7 +795,7 @@ export class Net {
 
 			try { Usion.game.requestRematch(); } catch { return false; }
 
-		} else this.sendAction( 'kickoff', { seats, seed: ( Math.random() * 0x7fffffff ) | 0, laps } );
+		} else this.sendAction( 'kickoff', { seats, seed: ( Math.random() * 0x7fffffff ) | 0, laps, track: this.track } );
 		return true;
 
 	}

@@ -6,13 +6,16 @@ import { Vehicle, MAX_SPEED } from './Vehicle.js';
 import { Camera } from './Camera.js';
 import { Controls } from './Controls.js';
 import { buildTrack, computeTrackBounds, TRACK_CELLS } from './Track.js';
-import { buildWallColliders, createSphereBody } from './Physics.js';
+import { buildCurvedWallColliders, buildWallColliders, createSphereBody } from './Physics.js';
 import { SmokeTrails } from './Particles.js';
 import { DriftMarks } from './DriftMarks.js';
 import { GameAudio } from './Audio.js';
 import { LapTimer } from './LapTimer.js';
 import { ColorMapGLTFLoader } from './Loader.js';
 import { TrackPath } from './TrackPath.js';
+import { MonacoPath } from './MonacoPath.js';
+import { buildMonacoTrack } from './MonacoTrack.js';
+import { MONACO_TRACK_ID } from './MonacoLayout.js';
 import { RemoteCar } from './RemoteCar.js';
 import { Bot, BOT_NAMES, BOT_SPEEDS } from './Bots.js';
 import { Net } from './net.js';
@@ -20,6 +23,8 @@ import { UI } from './ui.js';
 import { setLanguage, t } from './i18n.js';
 
 const DEFAULT_LAPS = 3;
+const DEFAULT_TRACK = 'og';
+const TRACK_OPTIONS = [ DEFAULT_TRACK, MONACO_TRACK_ID ];
 const MAX_PLAYERS = 4;
 const CAR_COLORS = [ 'vehicle-truck-yellow', 'vehicle-truck-green', 'vehicle-truck-purple', 'vehicle-truck-red' ];
 const BROADCAST_MS = 1000 / 60;   // one freshest owner transform per display frame
@@ -98,6 +103,7 @@ const G = {
 	broadcastTimer: null,
 	placements: null,
 	laps: DEFAULT_LAPS,
+	track: DEFAULT_TRACK,
 	nameCache: new Map(),
 	lastHeartbeat: 0,
 	snapSeq: 0,
@@ -106,6 +112,7 @@ const G = {
 };
 
 let renderer, scene, dirLight, cam, controls, particles, driftMarks, audio, audioRig, lapTimer, path, ui, net, models, world, contactListener;
+let ogPath, monacoPath, ogTrackGroup, monacoTrackGroup;
 
 const _forward = new THREE.Vector3();
 const _camLead = new THREE.Vector3();
@@ -262,7 +269,7 @@ async function init( config ) {
 	scene.fog.near = groundSize * 0.4;
 	scene.fog.far = groundSize * 0.8;
 
-	buildTrack( scene, models, null );
+	ogTrackGroup = buildTrack( scene, models, null );
 
 	const probeHeight = 6;
 	const probes = new LightProbeGrid(
@@ -298,7 +305,23 @@ async function init( config ) {
 		restitution: 0.0,
 	} );
 
-	path = new TrackPath( cells );
+	ogPath = new TrackPath( cells );
+	monacoPath = new MonacoPath();
+	monacoTrackGroup = buildMonacoTrack( scene, monacoPath );
+	monacoTrackGroup.visible = false;
+	buildCurvedWallColliders( world, monacoPath, null );
+
+	const monacoBounds = monacoPath.bounds( 4 );
+	rigidBody.create( world, {
+		shape: box.create( { halfExtents: [ monacoBounds.halfWidth, 0.01, monacoBounds.halfDepth ] } ),
+		motionType: MotionType.STATIC,
+		objectLayer: OL_STATIC,
+		position: [ monacoBounds.centerX, - 0.125, monacoBounds.centerZ ],
+		friction: 5.0,
+		restitution: 0.0,
+	} );
+
+	path = ogPath;
 
 	controls = new Controls();
 	controls.enabled = false;
@@ -325,17 +348,14 @@ async function init( config ) {
 		}
 	};
 
-	lapTimer = new LapTimer( cells, {
-		laps: DEFAULT_LAPS,
-		onLap: () => {},
-		onRaceEnd: ( total ) => onMyRaceEnd( total ),
-	} );
+	lapTimer = createLapTimer( DEFAULT_TRACK, DEFAULT_LAPS );
 
 	ui = new UI();
 	ui.onChatSend = ( v ) => { if ( net.sendChat( v ) ) ui.showBubble( G.config.userId, v ); };
 	ui.onLapChange = ( laps ) => net.setLaps( laps );
+	ui.onTrackChange = ( track ) => net.setTrack( track );
 	ui.readyBtn.addEventListener( 'click', () => net.setReady( ! net.me().ready ) );
-	ui.startBtn.addEventListener( 'click', () => net.startRace( net.laps ) );
+	ui.startBtn.addEventListener( 'click', () => net.startRace( net.laps, net.track ) );
 	ui.inviteBtn.addEventListener( 'click', () => net.invite() );
 	ui.botsBtn.addEventListener( 'click', () => startSoloRace() );
 	ui.againBtn.addEventListener( 'click', () => onRaceAgain() );
@@ -428,6 +448,50 @@ async function loadModels() {
 
 }
 
+function createLapTimer( trackId, laps ) {
+
+	const selectedPath = trackId === MONACO_TRACK_ID ? monacoPath : null;
+	return new LapTimer( selectedPath ? null : TRACK_CELLS, {
+		path: selectedPath,
+		trackId,
+		laps,
+		onLap: () => {},
+		onRaceEnd: ( total ) => onMyRaceEnd( total ),
+	} );
+
+}
+
+function activateTrack( requestedTrack ) {
+
+	const trackId = TRACK_OPTIONS.includes( requestedTrack ) ? requestedTrack : DEFAULT_TRACK;
+	const isMonaco = trackId === MONACO_TRACK_ID;
+	G.track = trackId;
+	path = isMonaco ? monacoPath : ogPath;
+	if ( ogTrackGroup ) ogTrackGroup.visible = ! isMonaco;
+	if ( monacoTrackGroup ) monacoTrackGroup.visible = isMonaco;
+
+	if ( scene ) {
+
+		const color = isMonaco ? 0x9bc9df : 0xadb2ba;
+		scene.background.set( color );
+		scene.fog.color.set( color );
+		scene.fog.near = isMonaco ? 38 : 30;
+		scene.fog.far = isMonaco ? 82 : 55;
+
+	}
+
+	if ( cam ) {
+
+		cam.initialized = false;
+		cam.camera.far = isMonaco ? 90 : 60;
+		cam.camera.updateProjectionMatrix();
+
+	}
+
+	lapTimer = createLapTimer( trackId, G.laps );
+
+}
+
 // ---------- Own vehicle ----------
 
 function makeOwnVehicle( colorName ) {
@@ -486,7 +550,7 @@ function startSoloRace() {
 
 	G.mode = 'solo';
 	G.laps = DEFAULT_LAPS;
-	lapTimer.totalLaps = G.laps;
+	activateTrack( DEFAULT_TRACK );
 	stopBroadcast();
 	clearRemotes();
 	ui.showHall( false );
@@ -548,21 +612,27 @@ function onRoster( roster ) {
 
 	for ( const p of roster ) G.nameCache.set( p.id, { name: p.name, isBot: false } );
 
-	if ( G.state === 'hall' ) ui.updateHall( roster, G.config.userId, net.isHost(), 2, net.laps );
+	if ( G.state === 'hall' ) ui.updateHall( roster, G.config.userId, net.isHost(), 2, net.laps, net.track );
 
 	const humans = roster.length;
 	ui.showChatButton( G.mode === 'mp' && humans >= 2 && ( G.state === 'hall' || G.state === 'racing' || G.state === 'countdown' || G.state === 'results' ) );
 
 }
 
-function onRaceSettings( { laps } ) {
+function onRaceSettings( { laps, track } ) {
 
-	G.laps = laps;
-	if ( G.state === 'hall' ) ui.updateLapChoice( laps, net.isHost() );
+	if ( [ 3, 5, 10 ].includes( Number( laps ) ) ) G.laps = Number( laps );
+	if ( TRACK_OPTIONS.includes( track ) ) G.track = track;
+	if ( G.state === 'hall' ) {
+
+		ui.updateLapChoice( G.laps, net.isHost() );
+		ui.updateTrackChoice( G.track, net.isHost() );
+
+	}
 
 }
 
-function onKickoff( { seats, laps, phase, countdownMs, elapsedMs } ) {
+function onKickoff( { seats, laps, track, phase, countdownMs, elapsedMs } ) {
 
 	if ( ! seats.includes( G.config.userId ) ) {
 
@@ -575,7 +645,7 @@ function onKickoff( { seats, laps, phase, countdownMs, elapsedMs } ) {
 
 	G.mode = 'mp';
 	G.laps = [ 3, 5, 10 ].includes( Number( laps ) ) ? Number( laps ) : DEFAULT_LAPS;
-	lapTimer.totalLaps = G.laps;
+	activateTrack( TRACK_OPTIONS.includes( track ) ? track : DEFAULT_TRACK );
 	G.seats = seats.slice( 0, MAX_PLAYERS );
 	G.mySeat = G.seats.indexOf( G.config.userId );
 

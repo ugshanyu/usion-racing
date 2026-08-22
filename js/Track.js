@@ -303,6 +303,8 @@ export function buildTrack( scene, models, customCells ) {
 
 	}
 
+	return trackGroup;
+
 }
 
 export function placePiece( models, key, gx, gz, orient ) {

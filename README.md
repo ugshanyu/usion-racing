@@ -21,9 +21,13 @@ authoritative `/ws` endpoint.
   drift-sensitive smooth correction toward the owner's reported transform.
   Car-to-car collision response intentionally remains a local calculation.
 - **Waiting room** — roster with avatars, per-player READY, host-only start,
-  `Usion.game.invite()`, play-with-bots escape hatch.
+  host-selectable 3/5/10 laps and OG/Monaco courses, `Usion.game.invite()`,
+  play-with-bots escape hatch.
 - **Original starter-kit course** — the compact tiled loop and scenery from the
-  initial racing version.
+  initial racing version remains the default.
+- **Monaco GP multiplayer course** — an opt-in, arcade-scaled version of the
+  official 3.337 km / 19-turn street circuit, with harbor, tunnel, city blocks,
+  barriers, and server-synchronized track selection.
 - **Instant solo play** (GameTok / Explore): 3-lap race against three bot drivers
   with real physics bodies (they collide with you and each other). All racers use
   the original Kenney truck models.
@@ -34,10 +38,12 @@ authoritative `/ws` endpoint.
 
 ## Race rules
 
-3 laps. Placements = order of finish-line crossings (sequenced `finished` actions,
-identical on every client). Best lap submits to the leaderboard (ascending — lower
-is better). Direct rooms submit the signed match result from the server so a
-result card lands back in the originating chat; relay fallback rooms use the host.
+The multiplayer host selects 3, 5, or 10 laps and either the OG Grid or Monaco GP.
+Solo play stays on the OG Grid for 3 laps. Placements = order of finish-line
+crossings (sequenced `finished` actions, identical on every client). Best lap
+submits to the leaderboard (ascending — lower is better). Direct rooms submit the
+signed match result from the server so a result card lands back in the originating
+chat; relay fallback rooms use the host.
 
 ## Development
 
@@ -77,6 +83,9 @@ then publish with `USION_SERVICE_ID`, `USION_API_TOKEN`, and `GAME_URL` via
 ## Credits
 
 - Game assets by [Kenney](https://kenney.nl/) (CC0)
+- Monaco course geometry derived from [OpenStreetMap relation 148194](https://www.openstreetmap.org/relation/148194),
+  © OpenStreetMap contributors, licensed under ODbL 1.0. FIA/F1 logos and branded
+  trackside artwork are not included.
 - “911 TURBO 930_Improved” by WolfGames36, based on the original model by
   Lexyc16, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
   An archived experimental copy is retained for reference but is not loaded by

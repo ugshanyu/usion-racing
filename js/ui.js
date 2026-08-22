@@ -10,6 +10,7 @@ const css = `
 		justify-content: center; background: rgba(10, 12, 16, 0.72); backdrop-filter: blur(14px);
 		-webkit-backdrop-filter: blur(14px); pointer-events: auto; padding: 24px 20px;
 		padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+	#hall { overflow-y: auto; }
 	.panel h1 { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
 	.panel .sub { font-size: 13px; opacity: 0.6; margin: 0 0 20px; text-align: center; }
 	.roster { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
@@ -31,6 +32,22 @@ const css = `
 	.btn.secondary { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.18); }
 	.btn.ready-on { background: #5af168; }
 	.btn:disabled { opacity: 0.35; cursor: default; }
+	.track-settings { width: 100%; max-width: 340px; margin: -8px 0 14px; }
+	.track-settings .setting-label { margin-bottom: 7px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+		text-transform: uppercase; opacity: 0.65; }
+	.track-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+	.track-option { min-height: 66px; display: flex; align-items: center; gap: 9px; padding: 8px 10px;
+		border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; background: rgba(255,255,255,0.07);
+		color: #fff; text-align: left; cursor: pointer; }
+	.track-option.selected { border-color: #ffbd38; background: rgba(255,189,56,0.14); box-shadow: inset 0 0 0 1px rgba(255,189,56,0.2); }
+	.track-option:focus-visible { outline: 2px solid #ffbd38; outline-offset: 2px; }
+	.track-option:disabled { opacity: 0.72; cursor: default; }
+	.track-code { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 9px;
+		background: #ffbd38; color: #16191f; font: 900 11px/1 inherit; letter-spacing: 0.04em; }
+	.track-copy { min-width: 0; }
+	.track-name { display: block; font-size: 13px; font-weight: 800; line-height: 1.15; }
+	.track-meta { display: block; margin-top: 3px; font-size: 10px; line-height: 1.2; opacity: 0.58; }
+	.track-attribution { margin-top: 5px; font-size: 9px; text-align: right; opacity: 0.45; }
 	.race-settings { width: 100%; max-width: 340px; display: flex; align-items: center; justify-content: space-between;
 		gap: 14px; margin: -8px 0 18px; }
 	.race-settings .setting-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
@@ -43,7 +60,10 @@ const css = `
 	@media (max-width: 390px) {
 		.race-settings { align-items: stretch; flex-direction: column; gap: 8px; }
 		.lap-options { max-width: none; width: 100%; }
+		.track-option { padding: 8px; }
+		.track-code { width: 30px; height: 30px; }
 	}
+	@media (max-height: 760px) { #hall { justify-content: flex-start; } }
 	.hint { font-size: 13px; opacity: 0.6; margin-top: 14px; text-align: center; }
 	#hud { position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 12px; right: 12px;
 		display: none; justify-content: space-between; align-items: flex-start; pointer-events: none; }
@@ -129,10 +149,33 @@ export class UI {
 
 		// Waiting hall
 		this.hall = this.el( 'div', 'panel', this.root );
+		this.hall.id = 'hall';
 		this.hall.style.display = 'none';
 		this.el( 'h1', null, this.hall, t( 'waitingRoom' ) );
 		this.el( 'p', 'sub', this.hall, t( 'waitingSub' ) );
 		this.rosterEl = this.el( 'div', 'roster', this.hall );
+		this.trackSettings = this.el( 'div', 'track-settings', this.hall );
+		this.el( 'div', 'setting-label', this.trackSettings, t( 'raceTrack' ) );
+		this.trackOptions = this.el( 'div', 'track-options', this.trackSettings );
+		this.trackButtons = new Map();
+
+		for ( const option of [
+			{ id: 'og', code: 'OG', name: t( 'originalTrack' ), meta: t( 'originalTrackMeta' ) },
+			{ id: 'monaco', code: 'MC', name: t( 'monacoTrack' ), meta: t( 'monacoTrackMeta' ) },
+		] ) {
+
+			const button = this.el( 'button', 'track-option', this.trackOptions );
+			button.type = 'button';
+			button.setAttribute( 'aria-label', `${ t( 'raceTrack' ) }: ${ option.name }` );
+			this.el( 'span', 'track-code', button, option.code );
+			const copy = this.el( 'span', 'track-copy', button );
+			this.el( 'span', 'track-name', copy, option.name );
+			this.el( 'span', 'track-meta', copy, option.meta );
+			button.addEventListener( 'click', () => { if ( this.onTrackChange ) this.onTrackChange( option.id ); } );
+			this.trackButtons.set( option.id, button );
+
+		}
+		this.el( 'div', 'track-attribution', this.trackSettings, t( 'mapAttribution' ) );
 		this.raceSettings = this.el( 'div', 'race-settings', this.hall );
 		this.el( 'div', 'setting-label', this.raceSettings, t( 'raceLength' ) );
 		this.lapOptions = this.el( 'div', 'lap-options', this.raceSettings );
@@ -253,7 +296,7 @@ export class UI {
 
 	}
 
-	updateHall( roster, myId, isHost, minPlayers, laps = 3 ) {
+	updateHall( roster, myId, isHost, minPlayers, laps = 3, track = 'og' ) {
 
 		this.rosterEl.textContent = '';
 
@@ -297,10 +340,24 @@ export class UI {
 		this.startBtn.style.display = isHost ? '' : 'none';
 		this.startBtn.disabled = roster.length < minPlayers || ! allReady;
 		this.updateLapChoice( laps, isHost );
+		this.updateTrackChoice( track, isHost );
 
 		this.hallHint.textContent = isHost
 			? ( roster.length < minPlayers ? t( 'needPlayers' ) : '' )
 			: t( 'waitingHost' );
+
+	}
+
+	updateTrackChoice( track, isHost ) {
+
+		for ( const [ value, button ] of this.trackButtons ) {
+
+			const selected = value === track;
+			button.className = selected ? 'track-option selected' : 'track-option';
+			button.disabled = ! isHost;
+			button.setAttribute( 'aria-pressed', selected ? 'true' : 'false' );
+
+		}
 
 	}
 

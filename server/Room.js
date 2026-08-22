@@ -7,6 +7,7 @@ import { submitResult } from './webhook.js';
 const CHAT_KEEP = 12;
 const MAX_AVATAR_BYTES = 1024;
 const LAP_OPTIONS = [ 3, 5, 10 ];
+const TRACK_OPTIONS = [ 'og', 'monaco' ];
 
 function clamp( value, min, max ) {
 
@@ -25,6 +26,12 @@ function text( value, length, fallback = '' ) {
 
 	if ( typeof value !== 'string' ) return fallback;
 	return value.replace( /[\u0000-\u001f\u007f]/g, '' ).trim().slice( 0, length ) || fallback;
+
+}
+
+function trackOption( value, fallback = null ) {
+
+	return typeof value === 'string' && TRACK_OPTIONS.includes( value ) ? value : fallback;
 
 }
 
@@ -60,6 +67,7 @@ export class Room {
 		this.onDestroy = onDestroy;
 		this.phase = 'waiting';
 		this.laps = 3;
+		this.track = 'og';
 		this.players = [];
 		this.connections = new Map();
 		this.spectators = new Set();
@@ -124,6 +132,7 @@ export class Room {
 			phase: this.phase,
 			match: this.match,
 			laps: this.laps,
+			track: this.track,
 			host_id: this.hostId(),
 			countdown_ms: this.phase === 'countdown' ? Math.max( 0, this.countdownEndsAt - now ) : 0,
 			elapsed_ms: this.raceStartedAt ? Math.max( 0, now - this.raceStartedAt ) : 0,
@@ -330,10 +339,25 @@ export class Room {
 		if ( type === 'race_settings' ) {
 
 			if ( player.userId !== this.hostId() || ! [ 'waiting', 'results' ].includes( this.phase ) ) return;
+			let changed = false;
 			const laps = Number( data.laps );
-			if ( ! LAP_OPTIONS.includes( laps ) ) return;
-			this.laps = laps;
-			this.publish( true );
+			const track = trackOption( data.track );
+
+			if ( LAP_OPTIONS.includes( laps ) && laps !== this.laps ) {
+
+				this.laps = laps;
+				changed = true;
+
+			}
+
+			if ( track && track !== this.track ) {
+
+				this.track = track;
+				changed = true;
+
+			}
+
+			if ( changed ) this.publish( true );
 			return;
 
 		}
@@ -378,6 +402,7 @@ export class Room {
 		const requested = Array.isArray( data.seats ) ? data.seats : [];
 		const requestedLaps = Number( data.laps );
 		if ( LAP_OPTIONS.includes( requestedLaps ) ) this.laps = requestedLaps;
+		this.track = trackOption( data.track, this.track );
 		const isRematch = this.phase === 'results';
 		const previousSeats = new Set( this.seats );
 		const eligible = this.players
@@ -487,7 +512,7 @@ export class Room {
 			winnerIds: winner ? [ winner.userId ] : [],
 			participants: racers.map( ( player ) => player.userId ),
 			reason,
-			finalStats: { match: this.match, placements: this.placements },
+			finalStats: { match: this.match, laps: this.laps, track: this.track, placements: this.placements },
 		} ).catch( ( error ) => console.error( '[RESULT]', error?.message || error ) );
 
 	}

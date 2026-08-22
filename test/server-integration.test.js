@@ -105,14 +105,16 @@ test( 'every player receives the same sequenced room snapshot and car coordinate
 		{ id: 'two', name: 'Two Driver', avatar: 'https://cdn.example/two.jpg' },
 	] );
 
-	// Only the host can choose one of the supported waiting-room race lengths.
-	action( one, 'race_settings', { laps: 10 } );
-	await waitFor( () => one.messages.find( ( message ) => message.payload?.laps === 10 ) );
-	action( two, 'race_settings', { laps: 5 } );
+	// Only the host can choose supported waiting-room race settings.
+	action( one, 'race_settings', { laps: 10, track: 'monaco' } );
+	await waitFor( () => one.messages.find( ( message ) => message.payload?.laps === 10 && message.payload?.track === 'monaco' ) );
+	action( two, 'race_settings', { laps: 5, track: 'og' } );
 	await delay( 80 );
-	assert.equal( one.messages.filter( ( message ) => message.payload?.laps ).at( - 1 ).payload.laps, 10 );
+	const selectedSettings = one.messages.filter( ( message ) => message.payload?.laps ).at( - 1 ).payload;
+	assert.equal( selectedSettings.laps, 10 );
+	assert.equal( selectedSettings.track, 'monaco' );
 
-	action( one, 'kickoff', { seats: [ 'one', 'two' ], laps: 10 } );
+	action( one, 'kickoff', { seats: [ 'one', 'two' ], laps: 10, track: 'monaco' } );
 	const kickoff = await waitFor( () => one.messages.find( ( message ) => (
 		( message.type === 'state_snapshot' || message.type === 'state_delta' )
 		&& message.payload.phase === 'countdown'
@@ -120,6 +122,7 @@ test( 'every player receives the same sequenced room snapshot and car coordinate
 	) ) );
 	assert.deepEqual( kickoff.payload.seats, [ 'one', 'two' ] );
 	assert.equal( kickoff.payload.laps, 10 );
+	assert.equal( kickoff.payload.track, 'monaco' );
 
 	// The authoritative countdown must always advance into the race. This
 	// protects the phase transition that clients use to leave the countdown UI.
@@ -225,6 +228,7 @@ test( 'every player receives the same sequenced room snapshot and car coordinate
 	) ) );
 	assert.deepEqual( rematch.payload.seats, [ 'one', 'two' ] );
 	assert.equal( rematch.payload.laps, 10 );
+	assert.equal( rematch.payload.track, 'monaco' );
 	assert.equal( two.messages.some( ( message ) => message.payload?.code === 'BAD_MESSAGE' ), false );
 
 } );

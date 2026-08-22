@@ -49,6 +49,7 @@ export class LapTimer {
 	constructor( cells, opts = {} ) {
 
 		this.storageKey = STORAGE_PREFIX + ( opts.trackId || 'default' );
+		this.path = opts.path || null;
 		this.totalLaps = opts.laps || 3;
 		this.onLap = opts.onLap || null;          // ( lapTime, lapIndex, isBest )
 		this.onRaceEnd = opts.onRaceEnd || null;  // ( totalTime )
@@ -63,9 +64,9 @@ export class LapTimer {
 		this.requiredCells = new Set();
 
 		const list = cells || TRACK_CELLS;
-		this.enabled = list.some( ( c ) => c[ 2 ] === FINISH );
+		this.enabled = !! this.path || list.some( ( c ) => c[ 2 ] === FINISH );
 
-		if ( this.enabled ) {
+		if ( this.enabled && ! this.path ) {
 
 			const spawn = computeSpawnPosition( list );
 			this.lineCenter.set( spawn.position[ 0 ], 0, spawn.position[ 2 ] );
@@ -94,6 +95,8 @@ export class LapTimer {
 		this.finished = false;
 		this.prevForwardProj = null;
 		this.visitedCells = new Set();
+		this.prevPathS = null;
+		this.pathTravel = 0;
 
 	}
 
@@ -109,6 +112,13 @@ export class LapTimer {
 
 		this.currentLapTime += dt;
 		this.totalTime += dt;
+
+		if ( this.path ) {
+
+			this.updatePathLap( position );
+			return;
+
+		}
 
 		const gx = Math.floor( position.x / this.cellSize );
 		const gz = Math.floor( position.z / this.cellSize );
@@ -135,6 +145,42 @@ export class LapTimer {
 		}
 
 		this.prevForwardProj = forwardProj;
+
+	}
+
+	updatePathLap( position ) {
+
+		const projection = this.path.project( position );
+		const currentS = projection.s;
+
+		if ( this.prevPathS !== null ) {
+
+			let delta = currentS - this.prevPathS;
+			if ( delta > this.path.length / 2 ) delta -= this.path.length;
+			if ( delta < - this.path.length / 2 ) delta += this.path.length;
+
+			const noTeleport = Math.abs( delta ) < Math.max( 6, this.path.length * 0.04 );
+			const onCourse = projection.distance <= this.path.roadHalfWidth + 1.4;
+
+			if ( noTeleport && onCourse ) {
+
+				this.pathTravel = Math.max( 0, this.pathTravel + delta );
+				const crossedForward = this.prevPathS > this.path.length * 0.75
+					&& currentS < this.path.length * 0.25
+					&& delta > 0;
+
+				if ( crossedForward ) {
+
+					if ( this.pathTravel >= this.path.length * 0.72 ) this.completeLap();
+					this.pathTravel = 0;
+
+				}
+
+			}
+
+		}
+
+		this.prevPathS = currentS;
 
 	}
 

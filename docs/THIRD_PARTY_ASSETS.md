@@ -19,3 +19,17 @@ Rebuild the game-ready file from an authorized Sketchfab download with:
 ```bash
 npm run prepare:porsche -- /path/to/911_turbo_930_improved.glb
 ```
+
+## Circuit de Monaco map geometry
+
+- Runtime data: `js/MonacoLayout.js`
+- Source: [OpenStreetMap relation 148194](https://www.openstreetmap.org/relation/148194), version 61 (2026-08-21)
+- Copyright: © OpenStreetMap contributors
+- License: [Open Database License 1.0](https://opendatacommons.org/licenses/odbl/1-0/)
+- Official circuit facts checked against the FIA circuit map: 3.337 km and 19 turns
+
+The route centreline was joined in race direction, rotated to start at the mapped
+start/finish node, converted from latitude/longitude to local metres, and simplified
+to a maximum 0.5 metre deviation. The game applies one uniform scale and widens the
+road for the original arcade trucks. No Formula 1, FIA, sponsor, or event logos are
+included.
