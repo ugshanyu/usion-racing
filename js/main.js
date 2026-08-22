@@ -357,7 +357,6 @@ async function init( config ) {
 	ui.readyBtn.addEventListener( 'click', () => net.setReady( ! net.me().ready ) );
 	ui.startBtn.addEventListener( 'click', () => net.startRace( net.laps, net.track ) );
 	ui.inviteBtn.addEventListener( 'click', () => net.invite() );
-	ui.botsBtn.addEventListener( 'click', () => startSoloRace() );
 	ui.againBtn.addEventListener( 'click', () => onRaceAgain() );
 
 	net = new Net();
@@ -544,7 +543,7 @@ function clearRemotes() {
 
 }
 
-// ---------- Solo (GameTok / Explore / bots escape hatch) ----------
+// ---------- Solo (GameTok / Explore) ----------
 
 function startSoloRace() {
 

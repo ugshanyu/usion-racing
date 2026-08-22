@@ -193,7 +193,6 @@ export class UI {
 		this.readyBtn = this.el( 'button', 'btn', this.hall, t( 'notReady' ) );
 		this.startBtn = this.el( 'button', 'btn', this.hall, t( 'startRace' ) );
 		this.inviteBtn = this.el( 'button', 'btn secondary', this.hall, t( 'invite' ) );
-		this.botsBtn = this.el( 'button', 'btn secondary', this.hall, t( 'playBots' ) );
 		this.hallHint = this.el( 'div', 'hint', this.hall, t( 'waitingHost' ) );
 
 		// HUD

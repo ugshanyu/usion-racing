@@ -21,8 +21,7 @@ authoritative `/ws` endpoint.
   drift-sensitive smooth correction toward the owner's reported transform.
   Car-to-car collision response intentionally remains a local calculation.
 - **Waiting room** — roster with avatars, per-player READY, host-only start,
-  host-selectable 3/5/10 laps and OG/Monaco courses, `Usion.game.invite()`,
-  play-with-bots escape hatch.
+  host-selectable 3/5/10 laps and OG/Monaco courses, and `Usion.game.invite()`.
 - **Original starter-kit course** — the compact tiled loop and scenery from the
   initial racing version remains the default.
 - **Monaco GP multiplayer course** — an opt-in, arcade-scaled version of the
