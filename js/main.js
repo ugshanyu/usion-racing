@@ -1214,8 +1214,22 @@ function animate() {
 
 function updateRaceMinimap() {
 
-	_forward.set( 0, 0, 1 ).applyQuaternion( G.vehicle.container.quaternion );
-	const heading = Math.atan2( _forward.x, _forward.z );
+	const velocity = G.vehicle.modelVelocity;
+	let heading;
+
+	if ( velocity.x * velocity.x + velocity.z * velocity.z > 0.01 ) {
+
+		// The rolling sphere moves opposite its positive local Z torque axis.
+		// Using real movement also keeps the marker correct while reversing.
+		heading = Math.atan2( velocity.x, velocity.z );
+
+	} else {
+
+		_forward.set( 0, 0, - 1 ).applyQuaternion( G.vehicle.container.quaternion );
+		heading = Math.atan2( _forward.x, _forward.z );
+
+	}
+
 	const rivals = [];
 
 	for ( const bot of G.bots ) rivals.push( bot.pos );
